@@ -4,6 +4,7 @@ import javax.sound.sampled.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class VSRGAudio {
@@ -13,11 +14,13 @@ public class VSRGAudio {
         Thread audioThread;
         boolean paused;
 
-        public AudioStream(String path, Mixer mixer) throws UnsupportedAudioFileException, IOException, LineUnavailableException {
+        public AudioStream(String path) throws UnsupportedAudioFileException, IOException, LineUnavailableException {
             this.input = AudioSystem.getAudioInputStream(new File(path));
             AudioFormat fmt = this.input.getFormat();
             double bytesPerS = (double)fmt.getFrameSize() * (double)fmt.getFrameRate();
-            this.dataLine = (SourceDataLine) mixer.getLine(new DataLine.Info(SourceDataLine.class, fmt, (int)(bytesPerS * 50 / 1000)));
+            DataLine.Info info = new DataLine.Info(SourceDataLine.class, fmt, (int)(bytesPerS * 50 / 1000));
+            System.out.println(AudioSystem.isLineSupported(info));
+            this.dataLine = (SourceDataLine) AudioSystem.getLine(info);
             this.audioThread = new Thread(() -> threadMain());
             paused = false;
         }
@@ -47,6 +50,7 @@ public class VSRGAudio {
                 while(true) {
                     byte[] buf = new byte[dataLine.getBufferSize()];
                     int read = input.read(buf);
+                    System.out.println(read);
                     dataLine.write(buf, 0, buf.length);
                     if(read == 0) break;
                     synchronized (this) {
@@ -65,7 +69,6 @@ public class VSRGAudio {
 
     public VSRGAudio() {
         Mixer.Info[] mixerInfos = AudioSystem.getMixerInfo();
-        System.out.println("Discovering Audio Devices...");
         for(int i = 0; i < mixerInfos.length; i++) {
             Mixer testMixer = AudioSystem.getMixer(mixerInfos[i]);
             if (testMixer.getMixerInfo().getName().startsWith("default")) {
@@ -81,7 +84,7 @@ public class VSRGAudio {
 
     public String loadSfx(String path) throws LineUnavailableException, UnsupportedAudioFileException, IOException {
         String key = Paths.get(path).getFileName().toString();
-        Clip clip = (Clip) mixer.getLine(new Line.Info(Clip.class));
+        Clip clip = AudioSystem.getClip();
         clip.open(AudioSystem.getAudioInputStream(new File(path)));
         sfxs.put(key, clip);
         return key;
@@ -92,10 +95,11 @@ public class VSRGAudio {
         if(clip == null) {
             throw new RuntimeException("Clip not found");
         }
+        clip.setMicrosecondPosition(0);
         clip.start();
     }
 
     public AudioStream loadMusic(String path) throws UnsupportedAudioFileException, LineUnavailableException, IOException {
-        return new AudioStream(path, mixer);
+        return new AudioStream(path);
     }
 }
