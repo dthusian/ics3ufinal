@@ -10,23 +10,22 @@ import java.util.HashMap;
 public class VSRGAudio {
     static class AudioStream {
         SourceDataLine dataLine;
-        AudioInputStream input;
         Thread audioThread;
-        boolean paused;
 
         public AudioStream(String path) throws UnsupportedAudioFileException, IOException, LineUnavailableException {
-            this.input = AudioSystem.getAudioInputStream(new File(path));
-            AudioFormat fmt = this.input.getFormat();
+            AudioInputStream input = AudioSystem.getAudioInputStream(new File(path));
+            AudioFormat fmt = input.getFormat();
             double bytesPerS = (double)fmt.getFrameSize() * (double)fmt.getFrameRate();
-            DataLine.Info info = new DataLine.Info(SourceDataLine.class, fmt, (int)(bytesPerS * 50 / 1000));
-            System.out.println(AudioSystem.isLineSupported(info));
-            this.dataLine = (SourceDataLine) AudioSystem.getLine(info);
-            this.audioThread = new Thread(() -> threadMain());
-            paused = false;
+            double bytesPerInterval = bytesPerS * 50 / 1000;
+            int roundedBufSize = (int)Math.round(bytesPerInterval / (double)fmt.getFrameSize() * fmt.getFrameSize());
+            DataLine.Info info = new DataLine.Info(SourceDataLine.class, fmt, roundedBufSize);
+            dataLine = (SourceDataLine) AudioSystem.getLine(info);
+            audioThread = new Thread(() -> threadMain(input));
         }
 
         public void start() {
-            this.audioThread.start();
+            dataLine.start();
+            audioThread.start();
         }
 
         public double getSecondPosition() {
@@ -34,51 +33,29 @@ public class VSRGAudio {
         }
 
         public void pause() {
-            synchronized (this) {
-                paused = true;
-            }
+            dataLine.stop();
         }
 
         public void resume() {
-            synchronized (this) {
-                paused = false;
-            }
+            dataLine.start();
         }
 
-        private void threadMain() {
+        private void threadMain(AudioInputStream input) {
             try {
                 while(true) {
                     byte[] buf = new byte[dataLine.getBufferSize()];
                     int read = input.read(buf);
-                    System.out.println(read);
                     dataLine.write(buf, 0, buf.length);
                     if(read == 0) break;
-                    synchronized (this) {
-                        if(paused) {
-                            Thread.sleep(5);
-                        }
-                    }
                 }
-            } catch(IOException | InterruptedException ignored) {
+            } catch(IOException ignored) {
             }
         }
     }
 
-    Mixer mixer;
     HashMap<String, Clip> sfxs;
 
     public VSRGAudio() {
-        Mixer.Info[] mixerInfos = AudioSystem.getMixerInfo();
-        for(int i = 0; i < mixerInfos.length; i++) {
-            Mixer testMixer = AudioSystem.getMixer(mixerInfos[i]);
-            if (testMixer.getMixerInfo().getName().startsWith("default")) {
-                mixer = AudioSystem.getMixer(mixerInfos[0]);
-                break;
-            }
-        }
-        if(mixer == null) {
-            throw new RuntimeException("No default audio device found");
-        }
         sfxs = new HashMap<>();
     }
 
