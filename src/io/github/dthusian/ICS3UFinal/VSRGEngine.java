@@ -40,7 +40,16 @@ public class VSRGEngine {
                     String[] noteInfo = line.split(",");
                     int lane = Math.floor(Integer.parseInt(noteInfo[0]) * 4 / 512);
                     int time = Integer.parseInt(noteInfo[2]);
-                    notes.add(new Note(time, lane));
+                    int type = Integer.parseInt(noteInfo[3]);
+                    int endTime;
+                    
+                    if (type == 7) {
+                        endTime = Integer.parseInt(noteInfo[5]); // might not work with the colon stuff
+                    } else {
+                        endTime = time;
+                    }
+                    
+                    notes.add(new Note(time, lane, type, endTime));
                 }
             }
         }
