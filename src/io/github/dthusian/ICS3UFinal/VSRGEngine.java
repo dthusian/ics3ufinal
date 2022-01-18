@@ -38,7 +38,7 @@ public class VSRGEngine {
                     
                 } else if (section.equals("Hit Objects")) {
                     String[] noteInfo = line.split(",");
-                    int lane = Math.floor(Integer.parseInt(noteInfo[0]) * 4 / 512);
+                    int lane = (int)Math.floor(Integer.parseInt(noteInfo[0]) * 4 / 512);
                     int time = Integer.parseInt(noteInfo[2]);
                     int type = Integer.parseInt(noteInfo[3]);
                     int endTime;
@@ -56,8 +56,8 @@ public class VSRGEngine {
         
         Timer mapTimer = new Timer();
         
-        for (int i = 0; i < notes.length; i++) {
-            mapTimer.schedule(notes[i].timer);
+        for (int i = 0; i < notes.size(); i++) {
+            //mapTimer.schedule(notes.get(i).timer);
         }
     }
 }
