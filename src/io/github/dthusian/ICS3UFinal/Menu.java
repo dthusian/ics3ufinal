@@ -1,11 +1,15 @@
 package io.github.dthusian.ICS3UFinal;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 public class Menu extends JPanel implements MouseListener, KeyListener, Runnable {
   public static final int MENU_MAIN = 0;
@@ -55,6 +59,30 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
     g2d.setFont(new Font("sans-serif", Font.PLAIN, 50));
     g2d.drawString("CS Mania", 50, 400);
     new Thread(this).start();
+  }
+  
+  public void drawSongSelect(Graphics g) {
+	  Graphics2D g2d = (Graphics2D)g;
+	  
+	  // get songs
+	  String songFolderPath = "src\\io\\github\\dthusian\\ICS3UFinal\\songs";
+	  File songFolder = new File(songFolderPath);
+	  File[] songFiles = songFolder.listFiles();
+	  
+	  // load map background as song select background
+	  try {
+		  BufferedImage image = ImageIO.read(new File(songFolderPath + "\\" + songFiles[0].getName()));
+	  } catch (IOException e) {
+		  
+	  }
+	  
+	  // create buttons for each song
+	  Point p = myGetMousePosition();
+	  int scroll = 50;
+	  for (int i = 0; i < songFiles.length; i++) {
+		  drawButton(g2d, new Color(159, 64, 255), songFiles[i].getName(), 50, scroll, 200, 50, 20, p);
+		  scroll += 100;
+	  }
   }
 
   public void paintComponent(Graphics g) {
