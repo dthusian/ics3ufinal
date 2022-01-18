@@ -24,6 +24,9 @@ public class VSRGEngine {
             if(line.charAt(0) == '[') {
                 section = line.substring(1, line.length() - 1);
             } else {
+            	
+            	// reads in all .osu file data
+            	
                 if(section.equals("General")) {
 
                 } else if (section.equals("Editor")) {
@@ -37,6 +40,9 @@ public class VSRGEngine {
                 } else if (section.equals("Timing Points")) {
                     
                 } else if (section.equals("Hit Objects")) {
+                	
+                	// reads in the notes and adds them into an arraylist as a Note class
+                	
                     String[] noteInfo = line.split(",");
                     int lane = (int)Math.floor(Integer.parseInt(noteInfo[0]) * 4 / 512);
                     int time = Integer.parseInt(noteInfo[2]);
@@ -56,8 +62,11 @@ public class VSRGEngine {
         
         Timer mapTimer = new Timer();
         
-        for (int i = 0; i < notes.size(); i++) {
-            //mapTimer.schedule(notes.get(i).timer);
+        /* have each note as an individual timer that does something when its time
+        for it to be drawn on screen/hit
+        */
+        for (int i = 0; i < notes.size(); i++) { // idk how this will work with large number of notes
+            mapTimer.schedule(notes.get(i).timer, notes.get(i).time);
         }
     }
 }
