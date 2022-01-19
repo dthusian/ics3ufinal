@@ -1,5 +1,6 @@
 package io.github.dthusian.ICS3UFinal;
 
+import javax.sound.sampled.Clip;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.*;
@@ -13,9 +14,5 @@ public class Main {
         frame.add(new Menu());
         frame.pack();
         frame.setVisible(true);
-        VSRGAudio audioEng = new VSRGAudio();
-        VSRGAudio.AudioStream stream = audioEng.loadMusic("xnor.wav");
-        stream.start();
-        Thread.sleep(10000);
     }
 }
