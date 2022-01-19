@@ -8,6 +8,7 @@ import java.util.Scanner;
 
 public class FileLoader {
 	public HashMap<String, HashMap<String, String>> readOsuFile(String path) throws IOException {
+		// converts osu file into readable format by program, split into sections
 		HashMap<String, HashMap<String, String>> osuFile = new HashMap<>();
 		
 		Scanner fileReader = new Scanner(new FileReader(path));
@@ -63,6 +64,7 @@ public class FileLoader {
 	}
 	
 	public String[] getBackground(String path) throws IOException {
+		// looks for line containing bg information and returns that
 		Scanner fileReader = new Scanner(new FileReader(path));
 		String signature = fileReader.nextLine();
         if(!signature.equals("osu file format v14")) {
@@ -85,6 +87,7 @@ public class FileLoader {
 	}
 	
 	public String[] getTitleArtist(String path) throws IOException {
+		// looks for line containing artist and title information and returns that
 		Scanner fileReader = new Scanner(new FileReader(path));
 		String signature = fileReader.nextLine();
         if(!signature.equals("osu file format v14")) {
