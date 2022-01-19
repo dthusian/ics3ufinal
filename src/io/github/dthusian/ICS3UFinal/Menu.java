@@ -9,6 +9,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class Menu extends JPanel implements MouseListener, KeyListener, Runnable {
@@ -17,7 +18,7 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
   public static final int MENU_GAME = 2;
   public static final int MENU_CREDITS = 3;
   public static final int MENU_GAME_RESULTS = 4;
-  int currentMenu = 0;
+  int currentMenu = 1;
 
   public Menu() {
     super();
@@ -61,26 +62,43 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
     new Thread(this).start();
   }
   
-  public void drawSongSelect(Graphics g) {
+  public void drawSongSelect(Graphics g) throws IOException {
 	  Graphics2D g2d = (Graphics2D)g;
+	  g2d.setPaint(new GradientPaint(0, 0, new Color(0, 0, 99), 0, this.getHeight(), new Color(9, 0, 173)));
+	  g2d.fillRect(0, 0, this.getWidth(), this.getHeight());
+	  FileLoader fileLoader = new FileLoader();
 	  
 	  // get songs
-	  String songFolderPath = "src\\io\\github\\dthusian\\ICS3UFinal\\songs";
-	  File songFolder = new File(songFolderPath);
-	  File[] songFiles = songFolder.listFiles();
+	  String songsFolderPath = "src\\io\\github\\dthusian\\ICS3UFinal\\songs";
+	  File songsFolder = new File(songsFolderPath);
+	  File[] songsFiles = songsFolder.listFiles();
 	  
+	  /*
 	  // load map background as song select background
 	  try {
 		  BufferedImage image = ImageIO.read(new File(songFolderPath + "\\" + songFiles[0].getName()));
 	  } catch (IOException e) {
 		  
 	  }
+	  */
 	  
-	  // create buttons for each song
 	  Point p = myGetMousePosition();
 	  int scroll = 50;
-	  for (int i = 0; i < songFiles.length; i++) {
-		  drawButton(g2d, new Color(159, 64, 255), songFiles[i].getName(), 50, scroll, 200, 50, 20, p);
+	  for (int i = 0; i < songsFiles.length; i++) {
+		  
+		  File songFolder = new File(songsFolderPath + "\\" + songsFiles[i].getName());
+		  File[] songFiles = songFolder.listFiles();
+		  String osuFilePath = null;
+		  for (int j = 0; j < songFiles.length; j++) {
+			  if (songFiles[j].getName().substring(songFiles[j].getName().length() - 4).equals(".osu")) {
+				  osuFilePath = songsFolderPath + "\\" + songFolder.getName() + "\\" + songFiles[j].getName();
+			  }
+		  }
+		  if (osuFilePath == null) {
+			  throw new FileNotFoundException("no .osu file");
+		  }
+		  
+		  drawButton(g2d, new Color(159, 64, 255), fileLoader.getTitleArtist(osuFilePath)[1] + " - " + fileLoader.getTitleArtist(osuFilePath)[0], 50, scroll, 200, 50, 20, p);
 		  scroll += 100;
 	  }
   }
@@ -89,6 +107,12 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
     super.paintComponent(g);
     if(currentMenu == MENU_MAIN) {
       drawMainMenu(g);
+    } else if (currentMenu == MENU_SONG_SELECT) {
+    	try {
+			drawSongSelect(g);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
     } else {
       throw new RuntimeException("Invalid menu");
     }
