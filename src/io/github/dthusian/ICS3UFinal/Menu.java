@@ -18,12 +18,13 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
   public static final int MENU_GAME = 2;
   public static final int MENU_CREDITS = 3;
   public static final int MENU_GAME_RESULTS = 4;
-  int currentMenu = 1;
+  int currentMenu = 0;
 
   public Menu() {
     super();
     setPreferredSize(new Dimension(600, 800));
     setBackground(new Color(0, 0, 0));
+    addMouseListener(this);
   }
 
   private void drawButton(Graphics g, Color col, String text, int baseX, int baseY, int width, int height, int slant, Point mousePos) {
@@ -68,7 +69,7 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
 	  g2d.fillRect(0, 0, this.getWidth(), this.getHeight());
 	  FileLoader fileLoader = new FileLoader();
 	  
-	  // get songs
+	  // get songs folder
 	  String songsFolderPath = "src\\io\\github\\dthusian\\ICS3UFinal\\songs";
 	  File songsFolder = new File(songsFolderPath);
 	  File[] songsFiles = songsFolder.listFiles();
@@ -86,6 +87,7 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
 	  int scroll = 50;
 	  for (int i = 0; i < songsFiles.length; i++) {
 		  
+		  // get each song inside songs folder
 		  File songFolder = new File(songsFolderPath + "\\" + songsFiles[i].getName());
 		  File[] songFiles = songFolder.listFiles();
 		  String osuFilePath = null;
@@ -101,6 +103,8 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
 		  drawButton(g2d, new Color(159, 64, 255), fileLoader.getTitleArtist(osuFilePath)[1] + " - " + fileLoader.getTitleArtist(osuFilePath)[0], 50, scroll, 200, 50, 20, p);
 		  scroll += 100;
 	  }
+	  
+	  new Thread(this).start();
   }
 
   public void paintComponent(Graphics g) {
@@ -145,12 +149,18 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
 
   @Override
   public void mouseClicked(MouseEvent e) {
-
+	  
   }
 
   @Override
   public void mousePressed(MouseEvent e) {
-
+	  if (currentMenu == MENU_MAIN) {
+		  if (e.getX() > 50 && e.getX() < 250 && e.getY() > 50 && e.getY() < 100) {
+			  currentMenu = MENU_SONG_SELECT;
+		  } else if (e.getX() > 50 && e.getX() < 250 && e.getY() > 150 && e.getY() < 200) {
+			  currentMenu = MENU_CREDITS;
+		  }
+	  }
   }
 
   @Override
