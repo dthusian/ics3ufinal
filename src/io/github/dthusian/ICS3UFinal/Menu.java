@@ -116,10 +116,12 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
 	  FileLoader fileLoader = new FileLoader();
 	  
 	  // testing purposes
-	  //Song psiMissing = new Song("src\\io\\github\\dthusian\\ICS3UFinal\\songs\\psimissing\\Mami Kawada - PSI-missing (TV Size) (PotatoDew) [[4K] Insane].osu");
-	  //VSRGEngine engine = new VSRGEngine(psiMissing);
+	  Song testSong = new Song("src\\io\\github\\dthusian\\ICS3UFinal\\songs\\psimissing\\Mami Kawada - PSI-missing (TV Size) (PotatoDew) [[4K] Insane].osu");
+	  VSRGEngine engine = new VSRGEngine(testSong);
 	  Note testNote = new Note(3000, 2, 0, 0);
 	  
+	  testSong.dimBg(0.5f, 0.0f);
+	  g.drawImage(testSong.background, 0, 0, null);
 	  gameLayout(g2d);
 	  
 	  new Thread(this).start();
@@ -138,6 +140,8 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
 	  g.fillRect(this.getWidth()/2 - 150, this.getHeight() - 105, 300, 5);
 	  g.fillRect(this.getWidth()/2 - 150, this.getHeight() - 50, 300, 5);
 	  
+	  g.setFont(new Font("sans-serif", Font.PLAIN, 52));
+	  g.drawString("0", 20, 50);
 	  g.setFont(new Font("sans-serif", Font.PLAIN, 50));
 	  g.setColor(new Color(255, 255, 255));
 	  g.drawString("0", 20, 50);

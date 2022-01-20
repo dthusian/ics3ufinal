@@ -5,6 +5,7 @@ import javax.sound.sampled.Clip;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.awt.image.BufferedImage;
+import java.awt.image.RescaleOp;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -52,7 +53,7 @@ public class Song {
                         }
                     } else if(pair[0].equals("AudioFilename")) {
                         Path path2 = Path.of(path).getParent().resolve(pair[1]);
-                        audio = VSRGAudio.loadMusic(path2.toString());
+                        //audio = VSRGAudio.loadMusic(path2.toString().trim());
                     } else if(pair[0].equals("AudioLeadIn")) {
                         audioLeadIn = Integer.parseInt(pair[1]);
                     }
@@ -72,7 +73,7 @@ public class Song {
                         if(values[2].charAt(0) == '"') {
                             values[2] = values[2].substring(1, values[2].length() - 1);
                         }
-                        background = ImageIO.read(new File(values[2]));
+                        background = ImageIO.read(new File(Path.of(path).getParent().resolve(values[2]).toString()));
                     }
                 } else if (section.equals("Timing Points")) {
                     // ignore
@@ -94,4 +95,10 @@ public class Song {
             }
         }
     }
+    
+    public void dimBg(float factor, float offset) {
+    	RescaleOp rescaleOp = new RescaleOp(factor, offset, null);
+    	rescaleOp.filter(this.background, this.background);
+    }
+    
 }
