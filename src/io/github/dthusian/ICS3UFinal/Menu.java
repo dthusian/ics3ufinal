@@ -1,6 +1,8 @@
 package io.github.dthusian.ICS3UFinal;
 
 import javax.imageio.ImageIO;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -107,6 +109,21 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
 	  new Thread(this).start();
   }
 
+  public void drawGame(Graphics g) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
+	  Graphics2D g2d = (Graphics2D)g;
+	  g2d.setPaint(new GradientPaint(0, 0, new Color(0, 0, 99), 0, this.getHeight(), new Color(9, 0, 173)));
+	  g2d.fillRect(0, 0, this.getWidth(), this.getHeight());
+	  FileLoader fileLoader = new FileLoader();
+	  
+	  // testing purposes
+	  Song psiMissing = new Song("src\\io\\github\\dthusian\\ICS3UFinal\\songs\\psimissing\\Mami Kawada - PSI-missing (TV Size) (PotatoDew) [[4K] Insane].osu");
+	  VSRGEngine engine = new VSRGEngine(psiMissing);
+  }
+  
+  public void gameLayout(Graphics g) {
+	  
+  }
+  
   public void paintComponent(Graphics g) {
     super.paintComponent(g);
     if(currentMenu == MENU_MAIN) {
@@ -115,6 +132,12 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
     	try {
 			drawSongSelect(g);
 		} catch (IOException e) {
+			e.printStackTrace();
+		}
+    } else if (currentMenu == MENU_GAME) {
+    	try {
+			drawGame(g);
+		} catch (IOException | UnsupportedAudioFileException | LineUnavailableException e) {
 			e.printStackTrace();
 		}
     } else {
