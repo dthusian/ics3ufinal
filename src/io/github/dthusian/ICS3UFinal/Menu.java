@@ -20,11 +20,11 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
   public static final int MENU_GAME = 2;
   public static final int MENU_CREDITS = 3;
   public static final int MENU_GAME_RESULTS = 4;
-  int currentMenu = 0;
+  int currentMenu = 2;
 
   public Menu() {
     super();
-    setPreferredSize(new Dimension(600, 800));
+    setPreferredSize(new Dimension(1280, 720));
     setBackground(new Color(0, 0, 0));
     addMouseListener(this);
   }
@@ -116,12 +116,31 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
 	  FileLoader fileLoader = new FileLoader();
 	  
 	  // testing purposes
-	  Song psiMissing = new Song("src\\io\\github\\dthusian\\ICS3UFinal\\songs\\psimissing\\Mami Kawada - PSI-missing (TV Size) (PotatoDew) [[4K] Insane].osu");
-	  VSRGEngine engine = new VSRGEngine(psiMissing);
+	  //Song psiMissing = new Song("src\\io\\github\\dthusian\\ICS3UFinal\\songs\\psimissing\\Mami Kawada - PSI-missing (TV Size) (PotatoDew) [[4K] Insane].osu");
+	  //VSRGEngine engine = new VSRGEngine(psiMissing);
+	  Note testNote = new Note(3000, 2, 0, 0);
+	  
+	  gameLayout(g2d);
+	  
+	  new Thread(this).start();
   }
   
   public void gameLayout(Graphics g) {
+	  g.setColor(new Color(211, 211, 211));
+	  g.fillRect(this.getWidth()/2 - 150, 0, 300, this.getHeight());
 	  
+	  g.setColor(new Color(0, 0, 0));
+	  g.fillRect(this.getWidth()/2 - 150, 0, 5, this.getHeight());
+	  g.fillRect(this.getWidth()/2 - 75, 0, 5, this.getHeight());
+	  g.fillRect(this.getWidth()/2, 0, 5, this.getHeight());
+	  g.fillRect(this.getWidth()/2 + 75, 0, 5, this.getHeight());
+	  g.fillRect(this.getWidth()/2 + 150, 0, 5, this.getHeight());
+	  g.fillRect(this.getWidth()/2 - 150, this.getHeight() - 105, 300, 5);
+	  g.fillRect(this.getWidth()/2 - 150, this.getHeight() - 50, 300, 5);
+	  
+	  g.setFont(new Font("sans-serif", Font.PLAIN, 50));
+	  g.setColor(new Color(255, 255, 255));
+	  g.drawString("0", 20, 50);
   }
   
   public void paintComponent(Graphics g) {
