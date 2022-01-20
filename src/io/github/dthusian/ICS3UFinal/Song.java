@@ -33,6 +33,9 @@ public class Song {
         String section = "";
         while(fileReader.hasNext()) {
             String line = fileReader.nextLine().trim();
+            
+            if (line.length() <= 0) continue;
+            
             if(line.charAt(0) == '[') {
                 section = line.substring(1, line.length() - 1);
             } else if (line == "") {
