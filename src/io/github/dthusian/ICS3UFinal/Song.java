@@ -35,12 +35,11 @@ public class Song {
         while(fileReader.hasNext()) {
             String line = fileReader.nextLine().trim();
             
-            if (line.length() <= 0) continue;
-            
-            if(line.charAt(0) == '[') {
+            if (line == "") {
+            	
+            }
+            else if(line.charAt(0) == '[') {
                 section = line.substring(1, line.length() - 1);
-            } else if (line == "") {
-                continue;
             } else {
 
                 // reads in all .osu file data
@@ -77,7 +76,7 @@ public class Song {
                     }
                 } else if (section.equals("Timing Points")) {
                     // ignore
-                } else if (section.equals("Hit Objects")) {
+                } else if (section.equals("HitObjects")) {
                     // reads in the notes and adds them into an arraylist as a Note class
 
                     String[] noteInfo = line.split(",");
@@ -91,6 +90,8 @@ public class Song {
                     } else {
                         endTime = time;
                     }
+                    
+                    notes.add(new Note(time, lane, type, endTime));
                 }
             }
         }

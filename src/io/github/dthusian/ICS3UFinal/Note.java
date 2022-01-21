@@ -31,6 +31,6 @@ class NoteTimer extends TimerTask {
     }
   
     public void run() {
-		    
+		System.out.println(time);
     }
 }

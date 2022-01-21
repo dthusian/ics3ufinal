@@ -21,7 +21,12 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
   public static final int MENU_CREDITS = 3;
   public static final int MENU_GAME_RESULTS = 4;
   int currentMenu = 2;
+  
+  boolean setupDone = false; // so that some things dont have to be redone every frame
 
+  Song song = null;
+  VSRGEngine engine = null;
+  
   public Menu() {
     super();
     setPreferredSize(new Dimension(1280, 720));
@@ -115,15 +120,17 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
 	  g2d.fillRect(0, 0, this.getWidth(), this.getHeight());
 	  FileLoader fileLoader = new FileLoader();
 	  
+	  if (!setupDone) {
 	  // testing purposes
-	  Song testSong = new Song("src\\io\\github\\dthusian\\ICS3UFinal\\songs\\psimissing\\Mami Kawada - PSI-missing (TV Size) (PotatoDew) [[4K] Insane].osu");
-	  VSRGEngine engine = new VSRGEngine(testSong);
-	  Note testNote = new Note(3000, 2, 0, 0);
-	  
-	  testSong.dimBg(0.5f, 0.0f);
-	  g.drawImage(testSong.background, 0, 0, null);
+		  this.song = new Song("src\\io\\github\\dthusian\\ICS3UFinal\\songs\\psimissing\\Mami Kawada - PSI-missing (TV Size) (PotatoDew) [[4K] Insane].osu");
+		  this.song.dimBg(0.5f, 0.0f);
+		  this.engine = new VSRGEngine(this.song);
+		  setupDone = true;
+		  System.out.println("done");
+	  }
+	
+	  g.drawImage(this.song.background, 0, 0, null);
 	  gameLayout(g2d);
-	  
 	  new Thread(this).start();
   }
   
