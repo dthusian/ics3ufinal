@@ -27,11 +27,15 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
   Song song = null;
   VSRGEngine engine = null;
   
+  boolean[] keysPressed = new boolean[4];
+  
   public Menu() {
     super();
     setPreferredSize(new Dimension(1280, 720));
     setBackground(new Color(0, 0, 0));
+    this.setFocusable(true);
     addMouseListener(this);
+    addKeyListener(this);
   }
 
   private void drawButton(Graphics g, Color col, String text, int baseX, int baseY, int width, int height, int slant, Point mousePos) {
@@ -131,20 +135,51 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
 	
 	  g.drawImage(this.song.background, 0, 0, null);
 	  gameLayout(g2d);
+	  
+	  if (this.keysPressed[0]) {
+		  g.setColor(new Color(250, 180, 240));
+		  g.fillRect(this.getWidth()/2 - 145, this.getHeight() - 80, 70, 30);
+	  }
+	  if (this.keysPressed[1]) {
+		  g.setColor(new Color(120, 200, 230));
+		  g.fillRect(this.getWidth()/2 - 70, this.getHeight() - 80, 70, 30);
+	  }
+	  if (this.keysPressed[2]) {
+		  g.setColor(new Color(255, 230, 130));
+		  g.fillRect(this.getWidth()/2 + 5, this.getHeight() - 80, 70, 30);
+	  }
+	  if (this.keysPressed[3]) {
+		  g.setColor(new Color(160, 230, 150));
+		  g.fillRect(this.getWidth()/2 + 80, this.getHeight() - 80, 70, 30); 
+	  }
+	  
+	  engine.tick();
+	  
 	  new Thread(this).start();
   }
   
   public void gameLayout(Graphics g) {
+	  g.setColor(new Color(124, 124, 124));
+	  g.fillRect(this.getWidth()/2 - 150, 0, 300, this.getHeight() - 85);
 	  g.setColor(new Color(211, 211, 211));
-	  g.fillRect(this.getWidth()/2 - 150, 0, 300, this.getHeight());
+	  g.fillRect(this.getWidth()/2 - 150, this.getHeight() - 85, 300, 35);
+	  
+	  g.setColor(new Color(250, 180, 240));
+	  g.fillRect(this.getWidth()/2 - 150, this.getHeight() - 50, 78, 50);
+	  g.setColor(new Color(160, 230, 150));
+	  g.fillRect(this.getWidth()/2 + 78, this.getHeight() - 50, 75, 50);
+	  g.setColor(new Color(120, 200, 230));
+	  g.fillRect(this.getWidth()/2 - 72, this.getHeight() - 50, 75, 50);
+	  g.setColor(new Color(255, 230, 130));
+	  g.fillRect(this.getWidth()/2 + 3, this.getHeight() - 50, 75, 50);
 	  
 	  g.setColor(new Color(0, 0, 0));
 	  g.fillRect(this.getWidth()/2 - 150, 0, 5, this.getHeight());
-	  g.fillRect(this.getWidth()/2 - 75, 0, 5, this.getHeight());
-	  g.fillRect(this.getWidth()/2, 0, 5, this.getHeight());
-	  g.fillRect(this.getWidth()/2 + 75, 0, 5, this.getHeight());
+	  g.fillRect(this.getWidth()/2 - 75, 0, 5, this.getHeight() - 50);
+	  g.fillRect(this.getWidth()/2, 0, 5, this.getHeight() - 50);
+	  g.fillRect(this.getWidth()/2 + 75, 0, 5, this.getHeight() - 50);
 	  g.fillRect(this.getWidth()/2 + 150, 0, 5, this.getHeight());
-	  g.fillRect(this.getWidth()/2 - 150, this.getHeight() - 105, 300, 5);
+	  g.fillRect(this.getWidth()/2 - 150, this.getHeight() - 85, 300, 5);
 	  g.fillRect(this.getWidth()/2 - 150, this.getHeight() - 50, 300, 5);
 	  
 	  g.setFont(new Font("sans-serif", Font.PLAIN, 52));
@@ -192,12 +227,40 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
 
   @Override
   public void keyPressed(KeyEvent e) {
-
+	  if (currentMenu == MENU_GAME) {
+		  if (e.getKeyChar() == 'd') {
+			  keysPressed[0] = true;
+			  repaint();
+		  } else if (e.getKeyChar() == 'f') {
+			  keysPressed[1] = true;
+			  repaint();
+		  } else if (e.getKeyChar() == 'j') {
+			  keysPressed[2] = true;
+			  repaint();
+		  } else if (e.getKeyChar() == 'k') {
+			  keysPressed[3] = true;
+			  repaint();
+		  }
+	  }
   }
 
   @Override
   public void keyReleased(KeyEvent e) {
-
+	  if (currentMenu == MENU_GAME) {
+		  if (e.getKeyChar() == 'd') {
+			  keysPressed[0] = false;
+			  repaint();
+		  } else if (e.getKeyChar() == 'f') {
+			  keysPressed[1] = false;
+			  repaint();
+		  } else if (e.getKeyChar() == 'j') {
+			  keysPressed[2] = false;
+			  repaint();
+		  } else if (e.getKeyChar() == 'k') {
+			  keysPressed[3] = false;
+			  repaint();
+		  }
+	  }
   }
 
   @Override
