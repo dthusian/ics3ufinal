@@ -57,14 +57,6 @@ public class VSRGAudio {
         clip.start();
     }
 
-    // loads a longer audio file for playing
-    // note that shorter files should be played with the sfx methods
-    public static Clip loadMusic(String path) throws UnsupportedAudioFileException, LineUnavailableException, IOException {
-        Clip clip = AudioSystem.getClip();
-        clip.open(AudioSystem.getAudioInputStream(new File(path)));
-        return clip;
-    }
-
     // attempt 2
     public static AudioStream loadMusic2(String path) throws LineUnavailableException, IOException, UnsupportedAudioFileException {
         AudioInputStream ais = AudioSystem.getAudioInputStream(new BufferedInputStream(new FileInputStream(new File(path))));
