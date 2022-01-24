@@ -10,7 +10,11 @@ import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) throws UnsupportedAudioFileException, LineUnavailableException, IOException, InterruptedException {
-    	VSRGAudio.AudioStream as = VSRGAudio.loadMusic2("run/xnor.wav");
-        Thread.sleep(10000);
+        JFrame frame = new JFrame("CS Mania");
+        frame.add(new Menu());
+        //frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        //frame.setUndecorated(true);
+        frame.pack();
+        frame.setVisible(true);
     }
 }

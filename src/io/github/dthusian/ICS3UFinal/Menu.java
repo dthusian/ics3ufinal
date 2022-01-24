@@ -43,7 +43,7 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
   }
 
   private void loadSongs() throws IOException, UnsupportedAudioFileException, LineUnavailableException {
-      String songsFolderPath = "src\\io\\github\\dthusian\\ICS3UFinal\\songs";
+      String songsFolderPath = "src/io/github/dthusian/ICS3UFinal/songs";
       File songsFolder = new File(songsFolderPath);
       File[] listFiles = songsFolder.listFiles();
       if(listFiles == null) {
