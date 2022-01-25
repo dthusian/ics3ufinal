@@ -20,8 +20,10 @@ public class Song {
     public BufferedImage background = null;
     public HashMap<String, String> metadata;
     public VSRGAudio.AudioStream audio;
+    public String audioPath;
     public int accuracy = 5;
-    public int audioLeadIn = 0;
+    public int audioLeadInMs = 0;
+    public int previewTimeMs = 0;
 
     public Song(String path) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
         metadata = new HashMap<>();
@@ -49,9 +51,11 @@ public class Song {
                         }
                     } else if(pair[0].equals("AudioFilename")) {
                         Path path2 = Path.of(path).getParent().resolve(pair[1]);
-                        audio = VSRGAudio.loadMusic2(path2.toString().trim());
+                        audioPath = String.valueOf(path2);
                     } else if(pair[0].equals("AudioLeadIn")) {
-                        audioLeadIn = Integer.parseInt(pair[1]);
+                        audioLeadInMs = Integer.parseInt(pair[1]);
+                    } else if(pair[0].equals("PreviewTime")) {
+                        previewTimeMs = Integer.parseInt(pair[1]);
                     }
                 } else if (section.equals("Editor")) {
                     // ignore (we have no editor)
@@ -92,6 +96,10 @@ public class Song {
                 }
             }
         }
+    }
+
+    public void loadAudio() throws UnsupportedAudioFileException, LineUnavailableException, IOException {
+        audio = VSRGAudio.loadMusic2(audioPath);
     }
     
     public void dimBg(float factor, float offset) {

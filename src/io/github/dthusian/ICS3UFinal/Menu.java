@@ -24,6 +24,8 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
   boolean setupDone = false; // so that some things dont have to be redone every frame
 
   ArrayList<Song> songs = new ArrayList<>();
+  int lastHoveredSong = -1;
+  VSRGAudio.AudioStream previewSong = null;
   VSRGEngine engine = null;
   VSRGRenderer render = null;
 
@@ -124,27 +126,36 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
 
     Point p = myGetMousePosition();
     int scroll = scrollOffset;
-    Song hoveredSong = null;
+    int hoveredSong = -1;
     for (int i = 0; i < songs.size(); i++) {
       HashMap<String, String> metadata = songs.get(i).metadata;
       if(drawButton(g2d, new Color(159, 64, 255), metadata.get("Artist") + " - " + metadata.get("Title") + " [" + metadata.get("Version") + "] ", 50, 50 + scroll, 800, 50, 20, p)) {
-        hoveredSong = songs.get(i);
+        hoveredSong = i;
       }
       scroll += 100;
     }
     g2d.setColor(new Color(0, 0, 0, 170));
     g2d.fillRect(20, 500, getWidth() - 40, getHeight() - 520);
-    if(hoveredSong != null) {
-      HashMap<String, String> metadata = hoveredSong.metadata;
+    if(hoveredSong != -1) {
+      Song hoveredSongSong = songs.get(hoveredSong);
+      if(lastHoveredSong != hoveredSong) {
+        if(previewSong != null) {
+          previewSong.stop();
+        }
+        previewSong = VSRGAudio.loadMusic2(hoveredSongSong.audioPath, hoveredSongSong.previewTimeMs / 1000.0);
+        previewSong.resume();
+      }
+      HashMap<String, String> metadata = hoveredSongSong.metadata;
       g2d.setColor(new Color(255, 255, 255));
       g2d.drawString("Title: " + metadata.get("Title"), 30, 540);
       g2d.drawString("Artist: " + metadata.get("Artist"), 30, 560);
-      g2d.drawString("OD: " + hoveredSong.accuracy, 30, 580);
-      g2d.drawString("Notes: " + hoveredSong.notes.size(), 30, 600);
-      int secondsRounded = (int)Math.floor(hoveredSong.audio.getSecondsLength());
+      g2d.drawString("OD: " + hoveredSongSong.accuracy, 30, 580);
+      g2d.drawString("Notes: " + hoveredSongSong.notes.size(), 30, 600);
+      int secondsRounded = (int)Math.floor(previewSong.getSecondsLength());
       int minutes = secondsRounded / 60;
       int secondsMod = secondsRounded % 60;
       g2d.drawString("Length: " + minutes + ":" + String.format("%02d", secondsMod), 30, 520);
+      lastHoveredSong = hoveredSong;
     }
   }
 
