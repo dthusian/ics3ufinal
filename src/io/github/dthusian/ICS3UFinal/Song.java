@@ -35,15 +35,12 @@ public class Song {
         while(fileReader.hasNext()) {
             String line = fileReader.nextLine().trim();
             
-            if (line == "") {
-            	
+            if (line.equals("") || line.startsWith("//")) {
+                // do nothing
             }
             else if(line.charAt(0) == '[') {
                 section = line.substring(1, line.length() - 1);
             } else {
-
-                // reads in all .osu file data
-
                 if (section.equals("General")) {
                     String[] pair = line.split(": ");
                     if(pair[0].equals("Mode")) {
