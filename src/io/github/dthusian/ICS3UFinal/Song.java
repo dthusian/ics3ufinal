@@ -19,7 +19,7 @@ public class Song {
     public ArrayList<Note> notes;
     public BufferedImage background = null;
     public HashMap<String, String> metadata;
-    public Clip audio;
+    public VSRGAudio.AudioStream audio;
     public int accuracy = 5;
     public int audioLeadIn = 0;
 
@@ -49,7 +49,7 @@ public class Song {
                         }
                     } else if(pair[0].equals("AudioFilename")) {
                         Path path2 = Path.of(path).getParent().resolve(pair[1]);
-                        //audio = VSRGAudio.loadMusic(path2.toString().trim());
+                        audio = VSRGAudio.loadMusic2(path2.toString().trim());
                     } else if(pair[0].equals("AudioLeadIn")) {
                         audioLeadIn = Integer.parseInt(pair[1]);
                     }

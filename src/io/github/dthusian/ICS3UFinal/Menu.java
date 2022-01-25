@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class Menu extends JPanel implements MouseListener, KeyListener, Runnable, MouseWheelListener {
+public class Menu extends JPanel implements MouseListener, KeyListener, Runnable, MouseWheelListener, WindowListener {
   public static final int MENU_MAIN = 0;
   public static final int MENU_SONG_SELECT = 1;
   public static final int MENU_GAME = 2;
@@ -46,6 +46,13 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
   private void loadSongs() throws IOException, UnsupportedAudioFileException, LineUnavailableException {
     String songsFolderPath = "src/io/github/dthusian/ICS3UFinal/songs";
     File songsFolder = new File(songsFolderPath);
+    if(!songsFolder.exists()) {
+      songsFolderPath = "songs/";
+      songsFolder = new File(songsFolderPath);
+      if(!songsFolder.exists()) {
+        throw new Error("Could not find songs folder");
+      }
+    }
     File[] listFiles = songsFolder.listFiles();
     if (listFiles == null) {
       throw new RuntimeException("Songs folder not present");
@@ -117,10 +124,27 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
 
     Point p = myGetMousePosition();
     int scroll = scrollOffset;
+    Song hoveredSong = null;
     for (int i = 0; i < songs.size(); i++) {
       HashMap<String, String> metadata = songs.get(i).metadata;
-      drawButton(g2d, new Color(159, 64, 255), metadata.get("Artist") + " - " + metadata.get("Title") + " [" + metadata.get("Version") + "] ", 50, 50 + scroll, 800, 50, 20, p);
+      if(drawButton(g2d, new Color(159, 64, 255), metadata.get("Artist") + " - " + metadata.get("Title") + " [" + metadata.get("Version") + "] ", 50, 50 + scroll, 800, 50, 20, p)) {
+        hoveredSong = songs.get(i);
+      }
       scroll += 100;
+    }
+    g2d.setColor(new Color(0, 0, 0, 170));
+    g2d.fillRect(20, 500, getWidth() - 40, getHeight() - 520);
+    if(hoveredSong != null) {
+      HashMap<String, String> metadata = hoveredSong.metadata;
+      g2d.setColor(new Color(255, 255, 255));
+      g2d.drawString("Title: " + metadata.get("Title"), 30, 540);
+      g2d.drawString("Artist: " + metadata.get("Artist"), 30, 560);
+      g2d.drawString("OD: " + hoveredSong.accuracy, 30, 580);
+      g2d.drawString("Notes: " + hoveredSong.notes.size(), 30, 600);
+      int secondsRounded = (int)Math.floor(hoveredSong.audio.getSecondsLength());
+      int minutes = secondsRounded / 60;
+      int secondsMod = secondsRounded % 60;
+      g2d.drawString("Length: " + minutes + ":" + String.format("%02d", secondsMod), 30, 520);
     }
   }
 
@@ -262,5 +286,40 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
   public void mouseWheelMoved(MouseWheelEvent e) {
     scrollOffset += e.getWheelRotation() * 80;
     System.out.println(scrollOffset);
+  }
+
+  @Override
+  public void windowOpened(WindowEvent e) {
+
+  }
+
+  @Override
+  public void windowClosing(WindowEvent e) {
+
+  }
+
+  @Override
+  public void windowClosed(WindowEvent e) {
+    System.exit(0);
+  }
+
+  @Override
+  public void windowIconified(WindowEvent e) {
+
+  }
+
+  @Override
+  public void windowDeiconified(WindowEvent e) {
+
+  }
+
+  @Override
+  public void windowActivated(WindowEvent e) {
+
+  }
+
+  @Override
+  public void windowDeactivated(WindowEvent e) {
+
   }
 }

@@ -11,10 +11,12 @@ public class VSRGAudio {
     static class AudioStream {
         public Thread thread;
         public AtomicInteger signal;
+        public double length;
 
-        AudioStream(Thread t, AtomicInteger i) {
+        AudioStream(Thread t, AtomicInteger i, double lengthSeconds) {
             thread = t;
             signal = i;
+            length = lengthSeconds;
         }
 
         public void pause() {
@@ -27,6 +29,10 @@ public class VSRGAudio {
 
         public void stop() {
             signal.set(2);
+        }
+
+        public double getSecondsLength() {
+            return length;
         }
     }
 
@@ -59,13 +65,14 @@ public class VSRGAudio {
 
     // attempt 2
     public static AudioStream loadMusic2(String path) throws LineUnavailableException, IOException, UnsupportedAudioFileException {
-        AudioInputStream ais = AudioSystem.getAudioInputStream(new BufferedInputStream(new FileInputStream(new File(path))));
+        File file = new File(path);
+        AudioInputStream ais = AudioSystem.getAudioInputStream(new BufferedInputStream(new FileInputStream(file)));
         AudioFormat audioFormat = ais.getFormat();
         DataLine.Info info = new DataLine.Info(SourceDataLine.class, audioFormat);
         SourceDataLine line = (SourceDataLine) AudioSystem.getLine(info);
         line.open(audioFormat);
         line.start();
-        AtomicInteger signal = new AtomicInteger(0);
+        AtomicInteger signal = new AtomicInteger(1);
         Thread audioThread = new Thread(() -> {
             try {
                 byte[] samples = new byte[4096];
@@ -93,7 +100,11 @@ public class VSRGAudio {
             }
         });
         audioThread.start();
-        AudioStream as = new AudioStream(audioThread, signal);
+        long audioFileLength = file.length();
+        int frameSize = audioFormat.getFrameSize();
+        double frameRate = audioFormat.getFrameRate();
+        double durationInSeconds = (audioFileLength / (frameSize * frameRate));
+        AudioStream as = new AudioStream(audioThread, signal, durationInSeconds);
         return as;
     }
 }
