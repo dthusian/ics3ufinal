@@ -88,7 +88,7 @@ public class VSRGAudio {
                     if (signalToken != 0) {
                         if (signalToken == 1) {
                             while (signalToken == 1) {
-                                Thread.sleep(1000);
+                                Thread.sleep(10);
                                 signalToken = signal.get();
                             }
                         } else if (signalToken == 2) {
