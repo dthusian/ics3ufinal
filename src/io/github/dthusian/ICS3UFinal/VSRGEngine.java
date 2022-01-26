@@ -25,13 +25,14 @@ public class VSRGEngine {
 
     public VSRGEngine(Song song) throws RuntimeException {
         currentSong = song;
-        startTime = System.currentTimeMillis() + GRACE_TIME + song.audioLeadInMs;
-        masterTime = -(GRACE_TIME + song.audioLeadInMs);
+        startTime = System.currentTimeMillis() + GRACE_TIME;
+        masterTime = -GRACE_TIME;
         Timer t = new Timer();
         t.schedule(new TimerTask() {
             @Override
             public void run() {
                 song.audio.resume();
+                System.out.println("Audio Started");
             }
         }, GRACE_TIME);
         t.schedule(new TimerTask() {
@@ -39,6 +40,8 @@ public class VSRGEngine {
             public void run() {
                 System.out.println("TPS: " + tickCount * 4);
                 System.out.println("Time: " + masterTime);
+                System.out.println("Dispatched Notes: " + dispatchNoteI);
+                System.out.println("Retired Notes: " + retireNoteI);
                 tickCount = 0;
             }
         }, 250, 250);
