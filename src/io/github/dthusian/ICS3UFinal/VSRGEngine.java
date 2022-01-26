@@ -1,6 +1,10 @@
 package io.github.dthusian.ICS3UFinal;
 
+import java.io.IOException;
 import java.util.*;
+
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 
 public class VSRGEngine {
     // Time to get ready
@@ -9,6 +13,10 @@ public class VSRGEngine {
     public static final long APPROACH_TIME = 1340;
     // Time from note passing the scanline to not being rendered
     public static final long MISS_TIME = 160;
+    
+    // Early hit window
+    public static final long DISPATCH_TIME = 160;
+    // Late hit window uses MISS_TIME
 
     // System.currentTimeMillis() when map started (when masterTime = 0)
     public long startTime;
@@ -22,9 +30,13 @@ public class VSRGEngine {
     public Song currentSong;
 
     public long tickCount = 0;
+    
+    public boolean[] clickedNotes;
+    public boolean[] keysPressed = new boolean[4];
 
     public VSRGEngine(Song song) throws RuntimeException {
         currentSong = song;
+        clickedNotes = new boolean[currentSong.notes.size()];
         startTime = System.currentTimeMillis() + GRACE_TIME;
         masterTime = -GRACE_TIME;
         Timer t = new Timer();
@@ -38,10 +50,13 @@ public class VSRGEngine {
         t.schedule(new TimerTask() {
             @Override
             public void run() {
+            	/*
                 System.out.println("TPS: " + tickCount * 4);
                 System.out.println("Time: " + masterTime);
+                
                 System.out.println("Dispatched Notes: " + dispatchNoteI);
                 System.out.println("Retired Notes: " + retireNoteI);
+                */
                 tickCount = 0;
             }
         }, 250, 250);
@@ -64,5 +79,37 @@ public class VSRGEngine {
             }
         }
         masterTime = newTime;
+    }
+    
+    public void press(int lane) {
+    	long currentTime = System.currentTimeMillis() - startTime;
+    	
+    	// might be changed for long notes
+    	if (keysPressed[lane]) return;
+    	keysPressed[lane] = true;
+    	
+    	for (int i = retireNoteI; i < dispatchNoteI + 1; i++) {
+    		Note currentNote = currentSong.notes.get(i);
+    		if (currentNote.lane == lane && Util.between(currentNote.time - DISPATCH_TIME, currentTime, currentNote.time + MISS_TIME) && !clickedNotes[i]) {
+				System.out.println("Note " + i + " hit at " + currentTime + " (" + currentNote.time + ") on lane " + lane);
+				clickedNotes[i] = true;
+				
+				// hitsound test
+				try {
+					VSRGAudio.playSfx(VSRGAudio.loadSfx("run/normal-hitwhistle.wav"));
+				} catch (RuntimeException | LineUnavailableException | UnsupportedAudioFileException | IOException e1) {
+					e1.printStackTrace();
+				}
+				
+				break;
+    		}
+    	}
+    }
+    
+    public void release(int lane) {
+    	long currentTime = System.currentTimeMillis() - startTime;
+    	
+    	if (!keysPressed[lane]) return;
+    	keysPressed[lane] = false;
     }
 }

@@ -209,12 +209,16 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
         if (currentMenu == MENU_GAME) {
             if (e.getKeyChar() == 'd') {
                 render.keyPress(0);
+                engine.press(0);
             } else if (e.getKeyChar() == 'f') {
                 render.keyPress(1);
+                engine.press(1);
             } else if (e.getKeyChar() == 'j') {
                 render.keyPress(2);
+                engine.press(2);
             } else if (e.getKeyChar() == 'k') {
                 render.keyPress(3);
+                engine.press(3);
             }
             repaint();
         }
@@ -225,12 +229,16 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
         if (currentMenu == MENU_GAME) {
             if (e.getKeyChar() == 'd') {
                 render.keyRelease(0);
+                engine.release(0);
             } else if (e.getKeyChar() == 'f') {
                 render.keyRelease(1);
+                engine.release(1);
             } else if (e.getKeyChar() == 'j') {
                 render.keyRelease(2);
+                engine.release(2);
             } else if (e.getKeyChar() == 'k') {
                 render.keyRelease(3);
+                engine.release(3);
             }
             repaint();
         }
