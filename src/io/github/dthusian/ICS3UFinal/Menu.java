@@ -260,6 +260,14 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
       } else if (e.getX() > 50 && e.getX() < 250 && e.getY() > 250 && e.getY() < 300) {
         close();
       }
+    } else if (currentMenu == MENU_SONG_SELECT) {
+      int clickedSong = -1;
+      for(int i = 0; i < songs.size(); i++) {
+        if(e.getX() > 50 && e.getX() < 850 && e.getY() + scrollOffset > i * 100 + 50 && e.getY() + scrollOffset < i * 100 + 150) {
+          clickedSong = i;
+          System.out.println("Click " + clickedSong);
+        }
+      }
     }
   }
 
