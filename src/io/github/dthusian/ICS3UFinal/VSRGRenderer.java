@@ -57,10 +57,10 @@ public class VSRGRenderer {
 
         // Score display
         g.setFont(new Font("sans-serif", Font.PLAIN, 52));
-        g.drawString("0", 20, 50);
+        g.drawString(String.valueOf(eng.score), 20, 50);
         g.setFont(new Font("sans-serif", Font.PLAIN, 50));
         g.setColor(new Color(255, 255, 255));
-        g.drawString("0", 20, 50);
+        g.drawString(String.valueOf(eng.score), 20, 50);
 
         // Draw notes
         long time = System.currentTimeMillis() - eng.startTime;
@@ -74,7 +74,6 @@ public class VSRGRenderer {
                 g.setColor(laneColors[currentNote.lane]);
             } else if (currentNote.clickState == 3) {
                 g.setColor(Util.colLerp(laneColors[currentNote.lane], new Color(0, 0, 0), 0.3));
-                System.out.println("amogus4");
             }
             if (currentNote.clickState != 1) // dont draw if already pressed
                 g.fillRect(panel.getWidth() / 2 + -150 + currentNote.lane * 75, farY - NOTE_THICKNESS / 2, 75, (posY - farY) + NOTE_THICKNESS);

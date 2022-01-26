@@ -29,7 +29,10 @@ public class VSRGEngine {
     public int numGood = 0;
     public int numBad = 0;
     public int numMiss = 0;
+    public long score = 0;
+    
     public int lastJudgement = -1; // 0 = miss, 1 = bad, 2 = good, 3 = perfect
+    public long lastJudgementTime = -1;
 
     public VSRGEngine(Song song) throws RuntimeException {
         currentSong = song;
@@ -49,14 +52,14 @@ public class VSRGEngine {
         t.schedule(new TimerTask() {
             @Override
             public void run() {
-                System.out.println("TPS: " + tickCount * 4);
+                //System.out.println("TPS: " + tickCount * 4);
                 tickCount = 0;
             }
         }, 250, 250);
     }
 
     public void keyPress(int lane) {
-        for(int i = retireNoteI + 1; i < dispatchNoteI + 1; i++) {
+        for(int i = retireNoteI; i < dispatchNoteI + 1; i++) {
             Note currentNote = currentSong.notes.get(i);
             // ignore pressed notes
             if(currentNote.lane != lane) {
@@ -72,16 +75,23 @@ public class VSRGEngine {
             long msError = Math.abs(masterTime - currentNote.time);
             if(msError <= Util.Timing.msPerfect) {
                 numPerfect++;
+                score += 150;
                 lastJudgement = 3;
+                lastJudgementTime = masterTime;
             } else if(msError <= Util.Timing.msGood) {
                 numGood++;
+                score += 100;
                 lastJudgement = 2;
+                lastJudgementTime = masterTime;
             } else if(msError <= Util.Timing.msBad) {
                 numBad++;
+                score += 50;
                 lastJudgement = 1;
+                lastJudgementTime = masterTime;
             } else if(msError <= Util.Timing.msMiss) {
                 numMiss++;
                 lastJudgement = 0;
+                lastJudgementTime = masterTime;
             }
             if(currentNote.isLongNote()) {
                 currentNote.clickState = 2;
@@ -92,7 +102,7 @@ public class VSRGEngine {
     }
 
     public void keyRelease(int lane) {
-        for(int i = retireNoteI + 1; i < dispatchNoteI + 1; i++) {
+        for(int i = retireNoteI; i < dispatchNoteI + 1; i++) {
             Note currentNote = currentSong.notes.get(i);
             // ignore pressed notes
             if (currentNote.lane != lane) {
@@ -105,24 +115,41 @@ public class VSRGEngine {
                 continue; // only currently held notes are relevant
             }
             // note release is relevant
-            long msError = Math.abs(masterTime - currentNote.time);
+            long msError = Math.abs(masterTime - currentNote.endTime);
             if(msError <= Util.Timing.msPerfect) {
                 numPerfect++;
+                score += 150;
                 lastJudgement = 3;
+                lastJudgementTime = masterTime;
             } else if(msError <= Util.Timing.msGood) {
                 numGood++;
+                score += 100;
                 lastJudgement = 2;
+                lastJudgementTime = masterTime;
             } else if(msError <= Util.Timing.msBad) {
                 numBad++;
+                score += 50;
                 lastJudgement = 1;
+                lastJudgementTime = masterTime;
             } else if(msError <= Util.Timing.msMiss) {
                 numMiss++;
                 lastJudgement = 0;
-                if(masterTime < currentNote.time) {
-                    // too early :bruh:
-                    currentNote.clickState = 3;
-                    System.out.println("amogus");
-                }
+                lastJudgementTime = masterTime;
+                System.out.println("MISS");
+            } else if(masterTime < currentNote.endTime) {
+                // too early :bruh:
+            	numMiss++;
+            	lastJudgement = 0;
+            	lastJudgementTime = masterTime;
+         
+                currentNote.clickState = 3;
+            }
+            
+            System.out.println(currentNote.endTime + " | " + masterTime + " | " + score);
+            
+            // change note back to clicked
+            if (currentNote.clickState != 3) {
+            	currentNote.clickState = 1;
             }
         }
     }
@@ -145,6 +172,7 @@ public class VSRGEngine {
                     // Unclicked :bruh:
                     numMiss++;
                     lastJudgement = 0;
+                    lastJudgementTime = masterTime;
                 }
             }
             if (Util.between(masterTime, currentNote.time - APPROACH_TIME * 2, newTime)) {
@@ -152,5 +180,10 @@ public class VSRGEngine {
             }
         }
         masterTime = newTime;
+        
+        // clear judgement message after some time
+        if (lastJudgementTime < masterTime - 1500) {
+        	lastJudgement = -1;
+        }
     }
 }
