@@ -3,20 +3,17 @@ package io.github.dthusian.ICS3UFinal;
 import java.util.*;
 
 public class VSRGEngine {
-    // Time from click of button to start of note stream
-    public static final long PREMAP_TIME = 2000;
+    // Time to get ready
+    public static final long GRACE_TIME = 2000;
     // Time from note appearing to click (might appear offscreen)
     public static final long APPROACH_TIME = 1340;
-    // Time from
+    // Time from note passing the scanline to not being rendered
     public static final long MISS_TIME = 160;
 
-    // System.currentTimeMillis() when map started
-    public long startTime = 0;
-    // -2000 -> 0: padding time before start
-    // 0 -> audioLeadIn: map started but audio not
-    // audioLeadIn -> inf: map and audio up
+    // System.currentTimeMillis() when map started (when masterTime = 0)
+    public long startTime;
     // This is the time since last tick
-    public long masterTime = -PREMAP_TIME;
+    public long masterTime;
 
     // Index of last note that was retired (went offscreen)
     public int retireNoteI = 0;
@@ -28,21 +25,23 @@ public class VSRGEngine {
 
     public VSRGEngine(Song song) throws RuntimeException {
         currentSong = song;
-        startTime = System.currentTimeMillis() + PREMAP_TIME;
+        startTime = System.currentTimeMillis() + GRACE_TIME + song.audioLeadInMs;
+        masterTime = -(GRACE_TIME + song.audioLeadInMs);
         Timer t = new Timer();
         t.schedule(new TimerTask() {
             @Override
             public void run() {
                 song.audio.resume();
             }
-        }, song.audioLeadInMs);
+        }, GRACE_TIME);
         t.schedule(new TimerTask() {
             @Override
             public void run() {
-                System.out.println("TPS: " + tickCount);
+                System.out.println("TPS: " + tickCount * 10);
+                System.out.println("Time: " + masterTime);
                 tickCount = 0;
             }
-        }, 1000, 1000);
+        }, 100, 100);
     }
 
     public void tick() {
@@ -52,14 +51,15 @@ public class VSRGEngine {
             Note currentNote = currentSong.notes.get(i);
             if (Util.between(masterTime, currentNote.time - APPROACH_TIME, newTime)) {
                 //currentNote.posY = (int) (((time - currentNote.time) / 2) - 60);
-                dispatchNoteI = i;
+                dispatchNoteI = Math.max(dispatchNoteI, i);
             }
             if (Util.between(masterTime, currentNote.time + MISS_TIME, newTime)) {
-                retireNoteI = i;
+                retireNoteI = Math.max(dispatchNoteI, i);
             }
             if (Util.between(masterTime, currentNote.time - APPROACH_TIME * 2, newTime)) {
                 break;
             }
         }
+        masterTime = newTime;
     }
 }

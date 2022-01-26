@@ -57,7 +57,7 @@ public class VSRGRenderer {
         for(int i = 0; i < eng.currentSong.notes.size(); i++) {
             Note currentNote = eng.currentSong.notes.get(i);
             final int NOTE_THICKNESS = 30;
-            int posY = (int) ((panel.getHeight() - 80 /* hitline position */) - (currentNote.time - time /* time to line */) * (2 /* approach rate */));
+            int posY = (int) ((panel.getHeight() - 80 /* hitline position */) - (currentNote.time - time /* time to line */) * (1.6 /* approach rate */));
             g.fillRect(panel.getWidth() / 2 + -150 + currentNote.lane * 75, posY - NOTE_THICKNESS / 2, 75, NOTE_THICKNESS);
         }
     }

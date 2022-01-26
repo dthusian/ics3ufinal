@@ -74,20 +74,20 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
         maxScroll = listFiles.length * 100 - 100;
     }
 
-    private boolean drawButton(Graphics g, Color col, String text, int baseX, int baseY, int width, int height, int slant, Point mousePos) {
-        boolean hoveredOver = false;
-        int shift = 0;
-        if (mousePos.x > baseX && mousePos.x < baseX + width && mousePos.y > baseY && mousePos.y < baseY + height) {
-            shift = 30;
-            hoveredOver = true;
-        }
+    private boolean drawButton(Graphics2D g, Color col, String text, int baseX, int baseY, int width, int height, int slant, Point mousePos) {
         g.setFont(new Font("sans-serif", Font.PLAIN, 20));
-        g.setColor(col);
+        boolean hoveredOver = false;
+        if (mousePos.x > baseX && mousePos.x < baseX + width && mousePos.y > baseY && mousePos.y < baseY + height) {
+            hoveredOver = true;
+            g.setPaint(new GradientPaint(0, baseY, col, 0, baseY + height, Util.colLerp(col, new Color(255, 255, 255), 0.7)));
+        } else {
+            g.setColor(col);
+        }
         g.fillPolygon(new int[]{
-                baseX + slant + shift,
-                baseX + width + shift,
-                baseX + width - slant + shift,
-                baseX + shift
+                baseX + slant,
+                baseX + width,
+                baseX + width - slant,
+                baseX
         }, new int[]{
                 baseY,
                 baseY,
@@ -95,7 +95,7 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
                 baseY + height
         }, 4);
         g.setColor(new Color(240, 240, 240));
-        g.drawString(text, baseX + 40 + shift, baseY + 35);
+        g.drawString(text, baseX + 40, baseY + 35);
         return hoveredOver;
     }
 
