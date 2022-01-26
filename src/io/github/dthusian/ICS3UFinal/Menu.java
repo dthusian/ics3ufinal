@@ -147,8 +147,10 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
             g2d.setColor(new Color(255, 255, 255));
             g2d.drawString("Title: " + metadata.get("Title"), 30, 540);
             g2d.drawString("Artist: " + metadata.get("Artist"), 30, 560);
-            g2d.drawString("OD: " + hoveredSongSong.accuracy, 30, 580);
-            g2d.drawString("Notes: " + hoveredSongSong.notes.size(), 30, 600);
+            g2d.drawString("Mapper: " + metadata.get("Creator"), 30, 580);
+            g2d.drawString("OD: " + hoveredSongSong.accuracy, 30, 600);
+            g2d.drawString("Notes: " + hoveredSongSong.notes.size(), 30, 620);
+
             int secondsRounded = (int) Math.floor(previewSong.getSecondsLength());
             int minutes = secondsRounded / 60;
             int secondsMod = secondsRounded % 60;

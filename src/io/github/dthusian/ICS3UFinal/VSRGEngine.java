@@ -39,9 +39,11 @@ public class VSRGEngine {
             public void run() {
                 System.out.println("TPS: " + tickCount * 10);
                 System.out.println("Time: " + masterTime);
+                System.out.println("Retired Notes: " + retireNoteI);
+                System.out.println("Dispatched Notes: " + dispatchNoteI);
                 tickCount = 0;
             }
-        }, 100, 100);
+        }, 250, 250);
     }
 
     public void tick() {
@@ -54,7 +56,7 @@ public class VSRGEngine {
                 dispatchNoteI = Math.max(dispatchNoteI, i);
             }
             if (Util.between(masterTime, currentNote.time + MISS_TIME, newTime)) {
-                retireNoteI = Math.max(dispatchNoteI, i);
+                retireNoteI = Math.max(retireNoteI, i);
             }
             if (Util.between(masterTime, currentNote.time - APPROACH_TIME * 2, newTime)) {
                 break;
