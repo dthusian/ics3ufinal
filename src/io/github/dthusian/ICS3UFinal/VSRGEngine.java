@@ -8,37 +8,50 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class VSRGEngine {
-    public long startTime = 0;
-    public long time = -1600;
-    public Song currentSong;
-    
-    public VSRGEngine(Song song) throws IOException, RuntimeException {
-        currentSong = song;
-        Timer mapTimer = new Timer();
-        
-        /* have each note as an individual timer that does something when its time
-        for it to be drawn on screen/hit
-        */
-        /*for (int i = 0; i < currentSong.notes.size(); i++) { // idk how this will work with large number of notes
-            mapTimer.schedule(currentSong.notes.get(i).timer, currentSong.notes.get(i).time);
-        }*/
-        startTime = System.currentTimeMillis();
+  public static final long PREMAP_TIME = 2000;
+  public static final long APPROACH_TIME = 1340;
+  public static final long MISS_TIME = 160;
+
+  // System.currentTimeMillis() when map started
+  public long startTime = 0;
+  // -2000 -> 0: padding time before start
+  // 0 -> audioLeadIn: map started but audio not
+  // audioLeadIn -> inf: map and audio up
+  // This is the time since last tick
+  public long masterTime = -PREMAP_TIME;
+  public int lastNoteI = 0;
+  public Song currentSong;
+
+  public VSRGEngine(Song song) throws RuntimeException {
+    currentSong = song;
+    startTime = System.currentTimeMillis() - PREMAP_TIME;
+    (new Timer()).schedule(new TimerTask() {
+      @Override
+      public void run() {
+        song.audio.resume();
+      }
+    }, song.audioLeadInMs);
+  }
+
+  public void tick() {
+    long time = System.currentTimeMillis() - startTime;
+    for (int i = lastNoteI + 1; i < currentSong.notes.size(); i++) {
+      Note currentNote = currentSong.notes.get(i);
+      if (time > currentNote.time - APPROACH_TIME) {
+        System.out.println(i);
+        currentNote.drawn = true;
+        currentNote.posY = (int) (((time - currentSong.notes.get(i).time) / 2) - 60);
+        lastNoteI = i;
+      }
+      if (time > currentSong.notes.get(i).time + MISS_TIME) {
+        currentNote.drawn = false;
+      }
+      if (time < currentNote.time - APPROACH_TIME * 2) {
+        break;
+      }
+      //if (currentNote.drawn)
+        //System.out.printf("%d: %d %d%n", time, currentSong.notes.get(i).posX, currentSong.notes.get(i).posY);
     }
-    
-    public void tick() {
-    	time = System.currentTimeMillis() - startTime;
-    	for (int i = 0; i < currentSong.notes.size(); i++) {
-    		if (time > currentSong.notes.get(i).time - 1340) {
-    			currentSong.notes.get(i).drawn = true;
-    			currentSong.notes.get(i).posY = (int)(((time - currentSong.notes.get(i).time) / 2) - 60);
-    		}
-    		if (time > currentSong.notes.get(i).time + 160) {
-    			currentSong.notes.get(i).drawn = false;
-    		}
-    		if (time < currentSong.notes.get(i).time - 2000) {
-    			break;
-    		}
-    		if (currentSong.notes.get(i).drawn) System.out.printf("%d: %d %d%n", time, currentSong.notes.get(i).posX, currentSong.notes.get(i).posY);
-    	}
-    }
+    masterTime = time;
+  }
 }

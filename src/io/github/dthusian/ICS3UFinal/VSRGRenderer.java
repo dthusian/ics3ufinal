@@ -36,7 +36,7 @@ public class VSRGRenderer {
         g.setColor(new Color(255, 230, 130));
         g.fillRect(panel.getWidth()/2 + 3, panel.getHeight() - 50, 75, 50);
 
-        g.setColor(new Color(0, 0, 0));
+        g.setColor(new Color(150, 150, 150));
         g.fillRect(panel.getWidth()/2 - 150, 0, 5, panel.getHeight());
         g.fillRect(panel.getWidth()/2 - 75, 0, 5, panel.getHeight() - 50);
         g.fillRect(panel.getWidth()/2, 0, 5, panel.getHeight() - 50);

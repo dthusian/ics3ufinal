@@ -21,18 +21,16 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
   public static final int MENU_GAME_RESULTS = 4;
   int currentMenu = 0;
 
-  boolean setupDone = false; // so that some things dont have to be redone every frame
-
+  // Song select vars
   ArrayList<Song> songs = new ArrayList<>();
   int lastHoveredSong = -1;
   VSRGAudio.AudioStream previewSong = null;
-  VSRGEngine engine = null;
-  VSRGRenderer render = null;
-
-  boolean[] keysPressed = new boolean[4];
-
   int scrollOffset = 0;
   int maxScroll = 0;
+
+  // Game vars
+  VSRGEngine engine = null;
+  VSRGRenderer render = null;
 
   public Menu() {
     super();
@@ -125,7 +123,7 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
     }
 
     Point p = myGetMousePosition();
-    int scroll = scrollOffset;
+    int scroll = -scrollOffset;
     int hoveredSong = -1;
     for (int i = 0; i < songs.size(); i++) {
       HashMap<String, String> metadata = songs.get(i).metadata;
@@ -163,15 +161,6 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
     Graphics2D g2d = (Graphics2D) g;
     g2d.setPaint(new GradientPaint(0, 0, new Color(0, 0, 99), 0, this.getHeight(), new Color(9, 0, 173)));
     g2d.fillRect(0, 0, this.getWidth(), this.getHeight());
-
-    if (!setupDone) {
-      // testing purposes
-      Song song = new Song("src\\io\\github\\dthusian\\ICS3UFinal\\songs\\psimissing\\Mami Kawada - PSI-missing (TV Size) (PotatoDew) [[4K] Insane].osu");
-      song.dimBg(0.5f, 0.0f);
-      this.engine = new VSRGEngine(song);
-      setupDone = true;
-      System.out.println("done");
-    }
 
     render.draw(this, g);
     engine.tick();
@@ -233,13 +222,13 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
   public void keyReleased(KeyEvent e) {
     if (currentMenu == MENU_GAME) {
       if (e.getKeyChar() == 'd') {
-        render.keyPress(0);
+        render.keyRelease(0);
       } else if (e.getKeyChar() == 'f') {
-        render.keyPress(1);
+        render.keyRelease(1);
       } else if (e.getKeyChar() == 'j') {
-        render.keyPress(2);
+        render.keyRelease(2);
       } else if (e.getKeyChar() == 'k') {
-        render.keyPress(3);
+        render.keyRelease(3);
       }
       repaint();
     }
@@ -265,8 +254,20 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
       for(int i = 0; i < songs.size(); i++) {
         if(e.getX() > 50 && e.getX() < 850 && e.getY() + scrollOffset > i * 100 + 50 && e.getY() + scrollOffset < i * 100 + 150) {
           clickedSong = i;
-          System.out.println("Click " + clickedSong);
         }
+      }
+      if(clickedSong != -1) {
+        Song clickedSongSong = songs.get(clickedSong);
+        try {
+          clickedSongSong.loadAudio();
+        } catch (UnsupportedAudioFileException | LineUnavailableException | IOException ex) {
+          ex.printStackTrace();
+        }
+        previewSong.stop();
+        previewSong = null;
+        engine = new VSRGEngine(clickedSongSong);
+        render = new VSRGRenderer(engine);
+        currentMenu = MENU_GAME;
       }
     }
   }
@@ -291,7 +292,9 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
     while (true) {
       repaint();
       try {
-        Thread.sleep(16);
+        if(currentMenu != MENU_GAME) {
+          Thread.sleep(16);
+        }
       } catch (InterruptedException ignored) {
       }
     }
@@ -303,8 +306,8 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
 
   @Override
   public void mouseWheelMoved(MouseWheelEvent e) {
-    scrollOffset += e.getWheelRotation() * 80;
-    System.out.println(scrollOffset);
+    scrollOffset += -e.getWheelRotation() * 80;
+    scrollOffset = Math.max(Math.min(scrollOffset, maxScroll), 0);
   }
 
   @Override
