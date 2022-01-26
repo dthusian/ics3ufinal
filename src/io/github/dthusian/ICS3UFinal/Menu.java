@@ -294,6 +294,8 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
       try {
         if(currentMenu != MENU_GAME) {
           Thread.sleep(16);
+        } else {
+          Thread.sleep(1);
         }
       } catch (InterruptedException ignored) {
       }
