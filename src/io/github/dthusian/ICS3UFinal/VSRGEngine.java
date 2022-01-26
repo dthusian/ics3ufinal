@@ -22,23 +22,33 @@ public class VSRGEngine {
   public int lastNoteI = 0;
   public Song currentSong;
 
+  public long tickCount = 0;
+
   public VSRGEngine(Song song) throws RuntimeException {
     currentSong = song;
     startTime = System.currentTimeMillis() - PREMAP_TIME;
-    (new Timer()).schedule(new TimerTask() {
+    Timer t = new Timer();
+    t.schedule(new TimerTask() {
       @Override
       public void run() {
         song.audio.resume();
       }
     }, song.audioLeadInMs);
+    t.schedule(new TimerTask() {
+      @Override
+      public void run() {
+        System.out.println("TPS: " + tickCount);
+        tickCount = 0;
+      }
+    }, 1000, 1000);
   }
 
   public void tick() {
+    tickCount++;
     long time = System.currentTimeMillis() - startTime;
     for (int i = lastNoteI + 1; i < currentSong.notes.size(); i++) {
       Note currentNote = currentSong.notes.get(i);
       if (time > currentNote.time - APPROACH_TIME) {
-        System.out.println(i);
         currentNote.drawn = true;
         currentNote.posY = (int) (((time - currentSong.notes.get(i).time) / 2) - 60);
         lastNoteI = i;
