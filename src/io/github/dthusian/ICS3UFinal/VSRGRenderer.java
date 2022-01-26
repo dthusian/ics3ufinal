@@ -20,52 +20,45 @@ public class VSRGRenderer {
         keysPressed[lane] = false;
     }
 
+    public void drawLane(JPanel panel, Graphics2D g, int xBase, int laneId, Color col) {
+        g.setColor(col);
+        if (this.keysPressed[laneId]) {
+            g.setColor(col);
+        } else {
+            g.setColor(new Color(70, 70, 70));
+        }
+        g.fillRect(panel.getWidth() / 2 + xBase, panel.getHeight() - 80, 75, 80);
+        g.setColor(new Color(150, 150, 150));
+        g.drawRect(panel.getWidth() / 2 + xBase, 0, 75, panel.getHeight());
+    }
+
     public void draw(JPanel panel, Graphics g) {
         g.drawImage(eng.currentSong.background, 0, 0, null);
-        g.setColor(new Color(124, 124, 124));
-        g.fillRect(panel.getWidth()/2 - 150, 0, 300, panel.getHeight() - 85);
-        g.setColor(new Color(211, 211, 211));
-        g.fillRect(panel.getWidth()/2 - 150, panel.getHeight() - 85, 300, 35);
+        g.setColor(new Color(40, 40, 40));
+        g.fillRect(panel.getWidth() / 2 - 150, 0, 300, panel.getHeight() - 80);
+        //g.setColor(new Color(211, 211, 211));
+        //g.fillRect(panel.getWidth() / 2 - 150, panel.getHeight() - 85, 300, 35);
 
-        g.setColor(new Color(250, 180, 240));
-        g.fillRect(panel.getWidth()/2 - 150, panel.getHeight() - 50, 78, 50);
-        g.setColor(new Color(160, 230, 150));
-        g.fillRect(panel.getWidth()/2 + 78, panel.getHeight() - 50, 75, 50);
-        g.setColor(new Color(120, 200, 230));
-        g.fillRect(panel.getWidth()/2 - 72, panel.getHeight() - 50, 75, 50);
-        g.setColor(new Color(255, 230, 130));
-        g.fillRect(panel.getWidth()/2 + 3, panel.getHeight() - 50, 75, 50);
+        // Draw lanes
+        Graphics2D g2d = (Graphics2D)g;
+        drawLane(panel, g2d, -150, 0, new Color(250, 180, 240));
+        drawLane(panel, g2d, -75, 1, new Color(120, 200, 230));
+        drawLane(panel, g2d, 0, 2, new Color(255, 230, 130));
+        drawLane(panel, g2d, +75, 3, new Color(160, 230, 150));
 
-        g.setColor(new Color(150, 150, 150));
-        g.fillRect(panel.getWidth()/2 - 150, 0, 5, panel.getHeight());
-        g.fillRect(panel.getWidth()/2 - 75, 0, 5, panel.getHeight() - 50);
-        g.fillRect(panel.getWidth()/2, 0, 5, panel.getHeight() - 50);
-        g.fillRect(panel.getWidth()/2 + 75, 0, 5, panel.getHeight() - 50);
-        g.fillRect(panel.getWidth()/2 + 150, 0, 5, panel.getHeight());
-        g.fillRect(panel.getWidth()/2 - 150, panel.getHeight() - 85, 300, 5);
-        g.fillRect(panel.getWidth()/2 - 150, panel.getHeight() - 50, 300, 5);
-
+        // Score display
         g.setFont(new Font("sans-serif", Font.PLAIN, 52));
         g.drawString("0", 20, 50);
         g.setFont(new Font("sans-serif", Font.PLAIN, 50));
         g.setColor(new Color(255, 255, 255));
         g.drawString("0", 20, 50);
 
-        if (this.keysPressed[0]) {
-            g.setColor(new Color(250, 180, 240));
-            g.fillRect(panel.getWidth()/2 - 145, panel.getHeight() - 80, 70, 30);
-        }
-        if (this.keysPressed[1]) {
-            g.setColor(new Color(120, 200, 230));
-            g.fillRect(panel.getWidth()/2 - 70, panel.getHeight() - 80, 70, 30);
-        }
-        if (this.keysPressed[2]) {
-            g.setColor(new Color(255, 230, 130));
-            g.fillRect(panel.getWidth()/2 + 5, panel.getHeight() - 80, 70, 30);
-        }
-        if (this.keysPressed[3]) {
-            g.setColor(new Color(160, 230, 150));
-            g.fillRect(panel.getWidth()/2 + 80, panel.getHeight() - 80, 70, 30);
+        // Draw notes
+        long time = System.currentTimeMillis() - eng.startTime;
+        for(int i = eng.retireNoteI; i <= eng.dispatchNoteI; i++) {
+            Note currentNote = eng.currentSong.notes.get(i);
+            int posY = (int) (((time - currentNote.time) / 2) - 60);
+
         }
     }
 }

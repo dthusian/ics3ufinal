@@ -30,31 +30,30 @@ public class Song {
         notes = new ArrayList<>();
         Scanner fileReader = new Scanner(new FileReader(path));
         String signature = fileReader.nextLine();
-        if(!signature.equals("osu file format v14")) {
+        if (!signature.equals("osu file format v14")) {
             throw new RuntimeException("Invalid file");
         }
         String section = "";
-        while(fileReader.hasNext()) {
+        while (fileReader.hasNext()) {
             String line = fileReader.nextLine().trim();
-            
+
             if (line.equals("") || line.startsWith("//")) {
                 // do nothing
-            }
-            else if(line.charAt(0) == '[') {
+            } else if (line.charAt(0) == '[') {
                 section = line.substring(1, line.length() - 1);
             } else {
                 if (section.equals("General")) {
                     String[] pair = line.split(": ");
-                    if(pair[0].equals("Mode")) {
-                        if(!pair[1].equals("3")) {
+                    if (pair[0].equals("Mode")) {
+                        if (!pair[1].equals("3")) {
                             throw new RuntimeException("Invalid file");
                         }
-                    } else if(pair[0].equals("AudioFilename")) {
+                    } else if (pair[0].equals("AudioFilename")) {
                         Path path2 = Path.of(path).getParent().resolve(pair[1]);
                         audioPath = String.valueOf(path2);
-                    } else if(pair[0].equals("AudioLeadIn")) {
+                    } else if (pair[0].equals("AudioLeadIn")) {
                         audioLeadInMs = Integer.parseInt(pair[1]);
-                    } else if(pair[0].equals("PreviewTime")) {
+                    } else if (pair[0].equals("PreviewTime")) {
                         previewTimeMs = Integer.parseInt(pair[1]);
                     }
                 } else if (section.equals("Editor")) {
@@ -64,13 +63,13 @@ public class Song {
                     metadata.put(pair[0], pair[1]);
                 } else if (section.equals("Difficulty")) {
                     String[] pair = line.split(":");
-                    if(pair[0].equals("OverallDifficulty")) {
+                    if (pair[0].equals("OverallDifficulty")) {
                         accuracy = Integer.parseInt(pair[1]);
                     }
                 } else if (section.equals("Events")) {
                     String[] values = line.split(",");
-                    if(values[0].equals("0")) {
-                        if(values[2].charAt(0) == '"') {
+                    if (values[0].equals("0")) {
+                        if (values[2].charAt(0) == '"') {
                             values[2] = values[2].substring(1, values[2].length() - 1);
                         }
                         background = ImageIO.read(new File(Path.of(path).getParent().resolve(values[2]).toString()));
@@ -81,7 +80,7 @@ public class Song {
                     // reads in the notes and adds them into an arraylist as a Note class
 
                     String[] noteInfo = line.split(",");
-                    int lane = (int)Math.floor(Integer.parseInt(noteInfo[0]) * 4 / 512);
+                    int lane = (int) Math.floor(Integer.parseInt(noteInfo[0]) * 4 / 512);
                     int time = Integer.parseInt(noteInfo[2]);
                     int type = Integer.parseInt(noteInfo[3]);
                     int endTime;
@@ -91,7 +90,7 @@ public class Song {
                     } else {
                         endTime = time;
                     }
-                    
+
                     notes.add(new Note(time, lane, type, endTime));
                 }
             }
@@ -101,10 +100,10 @@ public class Song {
     public void loadAudio() throws UnsupportedAudioFileException, LineUnavailableException, IOException {
         audio = VSRGAudio.loadMusic2(audioPath);
     }
-    
+
     public void dimBg(float factor, float offset) {
-    	RescaleOp rescaleOp = new RescaleOp(factor, offset, null);
-    	rescaleOp.filter(this.background, this.background);
+        RescaleOp rescaleOp = new RescaleOp(factor, offset, null);
+        rescaleOp.filter(this.background, this.background);
     }
-    
+
 }

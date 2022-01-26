@@ -1,67 +1,66 @@
 package io.github.dthusian.ICS3UFinal;
 
-import java.io.FileReader;
-import java.io.IOException; //ioexception from osu how
-import java.util.Scanner;
-import java.util.ArrayList;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 public class VSRGEngine {
-  public static final long PREMAP_TIME = 2000;
-  public static final long APPROACH_TIME = 1340;
-  public static final long MISS_TIME = 160;
+    // Time from click of button to start of note stream
+    public static final long PREMAP_TIME = 2000;
+    // Time from note appearing to click (might appear offscreen)
+    public static final long APPROACH_TIME = 1340;
+    // Time from
+    public static final long MISS_TIME = 160;
 
-  // System.currentTimeMillis() when map started
-  public long startTime = 0;
-  // -2000 -> 0: padding time before start
-  // 0 -> audioLeadIn: map started but audio not
-  // audioLeadIn -> inf: map and audio up
-  // This is the time since last tick
-  public long masterTime = -PREMAP_TIME;
-  public int lastNoteI = 0;
-  public Song currentSong;
+    // System.currentTimeMillis() when map started
+    public long startTime = 0;
+    // -2000 -> 0: padding time before start
+    // 0 -> audioLeadIn: map started but audio not
+    // audioLeadIn -> inf: map and audio up
+    // This is the time since last tick
+    public long masterTime = -PREMAP_TIME;
 
-  public long tickCount = 0;
+    // Index of last note that was retired (went offscreen)
+    public int retireNoteI = 0;
+    // Index of last note that was dispatched (came onscreen)
+    public int dispatchNoteI = 0;
+    public Song currentSong;
 
-  public VSRGEngine(Song song) throws RuntimeException {
-    currentSong = song;
-    startTime = System.currentTimeMillis() - PREMAP_TIME;
-    Timer t = new Timer();
-    t.schedule(new TimerTask() {
-      @Override
-      public void run() {
-        song.audio.resume();
-      }
-    }, song.audioLeadInMs);
-    t.schedule(new TimerTask() {
-      @Override
-      public void run() {
-        System.out.println("TPS: " + tickCount);
-        tickCount = 0;
-      }
-    }, 1000, 1000);
-  }
+    public long tickCount = 0;
 
-  public void tick() {
-    tickCount++;
-    long time = System.currentTimeMillis() - startTime;
-    for (int i = lastNoteI + 1; i < currentSong.notes.size(); i++) {
-      Note currentNote = currentSong.notes.get(i);
-      if (time > currentNote.time - APPROACH_TIME) {
-        currentNote.drawn = true;
-        currentNote.posY = (int) (((time - currentSong.notes.get(i).time) / 2) - 60);
-        lastNoteI = i;
-      }
-      if (time > currentSong.notes.get(i).time + MISS_TIME) {
-        currentNote.drawn = false;
-      }
-      if (time < currentNote.time - APPROACH_TIME * 2) {
-        break;
-      }
-      //if (currentNote.drawn)
-        //System.out.printf("%d: %d %d%n", time, currentSong.notes.get(i).posX, currentSong.notes.get(i).posY);
+    public VSRGEngine(Song song) throws RuntimeException {
+        currentSong = song;
+        startTime = System.currentTimeMillis() - PREMAP_TIME;
+        Timer t = new Timer();
+        t.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                song.audio.resume();
+            }
+        }, song.audioLeadInMs);
+        t.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                System.out.println("TPS: " + tickCount);
+                tickCount = 0;
+            }
+        }, 1000, 1000);
     }
-    masterTime = time;
-  }
+
+    public void tick() {
+        tickCount++;
+        long time = System.currentTimeMillis() - startTime;
+        for (int i = retireNoteI + 1; i < currentSong.notes.size(); i++) {
+            Note currentNote = currentSong.notes.get(i);
+            if (time > currentNote.time - APPROACH_TIME) {
+                currentNote.posY = (int) (((time - currentNote.time) / 2) - 60);
+                dispatchNoteI = i;
+            }
+            if (time > currentNote.time + MISS_TIME) {
+                retireNoteI = i;
+            }
+            if (time < currentNote.time - APPROACH_TIME * 2) {
+                break;
+            }
+        }
+        masterTime = time;
+    }
 }
