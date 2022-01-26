@@ -37,10 +37,8 @@ public class VSRGEngine {
         t.schedule(new TimerTask() {
             @Override
             public void run() {
-                System.out.println("TPS: " + tickCount * 10);
+                System.out.println("TPS: " + tickCount * 4);
                 System.out.println("Time: " + masterTime);
-                System.out.println("Retired Notes: " + retireNoteI);
-                System.out.println("Dispatched Notes: " + dispatchNoteI);
                 tickCount = 0;
             }
         }, 250, 250);
