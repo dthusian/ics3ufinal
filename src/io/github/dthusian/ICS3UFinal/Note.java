@@ -7,8 +7,6 @@ public class Note {
     public int time = 0;
     public int lane = 0;
     public int type = 0; // long note/normal note
-    public int posX = 0; // probably needed for drawing them
-    public int posY = 0;
     public int endTime = 0; // only applies to long note
 
     public Note(int time, int lane, int type, int endTime) {
@@ -16,16 +14,5 @@ public class Note {
         this.lane = lane;
         this.endTime = endTime;
         this.type = type;
-
-        if (this.lane == 0) {
-            this.posX = 495;
-        } else if (this.lane == 1) {
-            this.posX = 570;
-        } else if (this.lane == 2) {
-            this.posX = 645;
-        } else if (this.lane == 3) {
-            this.posX = 720;
-        }
-
     }
 }

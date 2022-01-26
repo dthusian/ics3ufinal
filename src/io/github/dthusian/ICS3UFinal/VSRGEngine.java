@@ -28,7 +28,7 @@ public class VSRGEngine {
 
     public VSRGEngine(Song song) throws RuntimeException {
         currentSong = song;
-        startTime = System.currentTimeMillis() - PREMAP_TIME;
+        startTime = System.currentTimeMillis() + PREMAP_TIME;
         Timer t = new Timer();
         t.schedule(new TimerTask() {
             @Override
@@ -47,20 +47,19 @@ public class VSRGEngine {
 
     public void tick() {
         tickCount++;
-        long time = System.currentTimeMillis() - startTime;
+        long newTime = System.currentTimeMillis() - startTime;
         for (int i = retireNoteI + 1; i < currentSong.notes.size(); i++) {
             Note currentNote = currentSong.notes.get(i);
-            if (time > currentNote.time - APPROACH_TIME) {
-                currentNote.posY = (int) (((time - currentNote.time) / 2) - 60);
+            if (Util.between(masterTime, currentNote.time - APPROACH_TIME, newTime)) {
+                //currentNote.posY = (int) (((time - currentNote.time) / 2) - 60);
                 dispatchNoteI = i;
             }
-            if (time > currentNote.time + MISS_TIME) {
+            if (Util.between(masterTime, currentNote.time + MISS_TIME, newTime)) {
                 retireNoteI = i;
             }
-            if (time < currentNote.time - APPROACH_TIME * 2) {
+            if (Util.between(masterTime, currentNote.time - APPROACH_TIME * 2, newTime)) {
                 break;
             }
         }
-        masterTime = time;
     }
 }
