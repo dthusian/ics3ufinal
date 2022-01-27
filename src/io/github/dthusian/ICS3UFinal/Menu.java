@@ -264,13 +264,11 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
         g.drawString(String.format("Miss: %d", engine.numMiss), 50, 340);
         g.setColor(new Color(255, 255, 255));
         g.drawString(String.format("Accuracy: %.2f", engine.accuracy()), 50, 420);
-        drawButton((Graphics2D)g, new Color(235, 102, 75), "Back", 50, this.getHeight() - 100, 500, 50, 20, myGetMousePosition());
+        drawButton((Graphics2D)g, new Color(235, 102, 75), "Back", 50, this.getHeight() - 100, 200, 50, 20, myGetMousePosition());
     }
 
     public void drawInstructions(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
-        g2d.setColor(new Color(70, 70, 70));
-        g2d.fillRect(0, 0, this.getWidth(), this.getHeight());
         
         g2d.drawImage(mainMenuBg, 0, 0, this.getWidth(), this.getHeight(), this);
         
@@ -278,10 +276,11 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
         g2d.setFont(new Font("sans-serif", Font.PLAIN, 20));
         g2d.drawString("CS mania was made like a classic mania-type VSRG.", 50, 100);
         g2d.drawString("Each lane is assigned the keys DFJK. When the notes reach the line, tap the short notes, hold on the long notes.", 50, 125);
-        g2d.drawString("Accuracy is key.", 50, 150);
-        g2d.drawString("Credits:", 50, 200);
-        g2d.drawString("Developers: Brendan Tam, Adrian Wu", 50, 225);
-        g2d.drawString("Mapping: Brendan Tam, other osu users", 50, 250);
+        g2d.drawString("Long notes must be released on time.", 50, 150);
+        g2d.drawString("Accuracy is key.", 50, 175);
+        g2d.drawString("Credits:", 50, 225);
+        g2d.drawString("Developers: Brendan Tam, Adrian Wu", 50, 250);
+        g2d.drawString("Mapping: Brendan Tam, other osu users", 50, 275);
         drawButton(g2d, new Color(235, 102, 75), "Back", this.getWidth() - 220, 50, 200, 50, 20, myGetMousePosition());
     }
 
@@ -407,6 +406,7 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
             } else if (e.getX() > 25 && e.getX() < 225 && e.getY() > this.getHeight() - 75 && e.getY() < this.getHeight() - 25) {
             	if (previewSong != null) {
             		previewSong.stop();
+            		previewSong = null;
             	}
             }
         } else if (currentMenu == MENU_SONG_SELECT) {
