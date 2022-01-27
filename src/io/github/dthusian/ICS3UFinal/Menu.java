@@ -64,7 +64,7 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
             File[] innerFiles = listFiles[i].listFiles();
             boolean foundOsuFile = false;
             for (int j = 0; j < innerFiles.length; j++) {
-                if (innerFiles[j].getName().substring(innerFiles[j].getName().length() - 4).equals(".osu")) {
+                if (innerFiles[j].getName().substring(Math.max(innerFiles[j].getName().length() - 4, 0)).equals(".osu")) {
                     foundOsuFile = true;
                     songs.add(new Song(innerFiles[j].getAbsolutePath()));
                 }
