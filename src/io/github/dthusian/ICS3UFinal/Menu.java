@@ -49,7 +49,15 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
         addMouseWheelListener(this);
         frame.addWindowListener(this);
         
+        // load main menu background
         File bgFile = new File("src/io/github/dthusian/ICS3UFinal/mainmenubg.png");
+        if (!bgFile.exists()) {
+        	bgFile = new File("mainmenubg.png");
+        	if (!bgFile.exists()) {
+        		throw new Error("Could not find main menu background");
+        	}
+        }
+        
         try {
 			mainMenuBg = ImageIO.read(bgFile);
 		} catch (IOException e) {
@@ -125,7 +133,6 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
         Graphics2D g2d = (Graphics2D) g;
         
         g2d.drawImage(mainMenuBg, 0, 0, this.getWidth(), this.getHeight(), this);
-        
         g2d.setColor(new Color(0, 0, 0, 50));
         g2d.fillRect(0, 0, this.getWidth(), 100);
         g2d.fillRect(0, this.getHeight() - 100, this.getWidth(), 100);
@@ -137,6 +144,8 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
         g2d.setColor(new Color(240, 240, 240));
         g2d.setFont(new Font("sans-serif", Font.BOLD, 100));
         g2d.drawString("CS Mania", this.getWidth() / 2 - 225, this.getHeight() / 2 - 150);
+        
+        drawButton(g2d, new Color(122, 106, 166), "Stop Music", 25, this.getHeight() - 75, 190, 50, 30, p);
     }
     
     // Draws song select
@@ -395,6 +404,10 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
                 currentMenu = MENU_CREDITS;
             } else if (e.getX() > this.getWidth() / 2 - 100 && e.getX() < this.getWidth() / 2 + 100 && e.getY() > this.getHeight() / 2 + 75 && e.getY() < this.getHeight() / 2 + 125) {
                 close();
+            } else if (e.getX() > 25 && e.getX() < 225 && e.getY() > this.getHeight() - 75 && e.getY() < this.getHeight() - 25) {
+            	if (previewSong != null) {
+            		previewSong.stop();
+            	}
             }
         } else if (currentMenu == MENU_SONG_SELECT) {
         	if (e.getX() > this.getWidth() - 220 && e.getX() < this.getWidth() - 20 && e.getY() > 50 && e.getY() < 100) {
