@@ -28,6 +28,7 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
     VSRGAudio.AudioStream previewSong = null;
     int scrollOffset = 0;
     int maxScroll = 0;
+    ScoreDB scores = null;
 
     // Game vars
     VSRGEngine engine = null;
@@ -73,6 +74,7 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
             }
         }
         maxScroll = listFiles.length * 100 - 100;
+        scores = new ScoreDB(new File("scores.txt"));
     }
 
     private boolean drawButton(Graphics2D g, Color col, String text, int baseX, int baseY, int width, int height, int slant, Point mousePos) {
@@ -156,6 +158,24 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
             g2d.drawString("OD: " + hoveredSongSong.accuracy, 30, 600);
             g2d.drawString("Notes: " + hoveredSongSong.notes.size(), 30, 620);
 
+            ScoreDB.ScoreEntry score = scores.scores.get(ScoreDB.getKey(metadata));
+            if(score != null) {
+                g2d.drawString("Top Score:", 30, 660);
+                g2d.setColor(Util.colorPerfect);
+                g2d.drawString(String.valueOf(score.numPerfect), 160, 660);
+                g2d.setColor(Util.colorGood);
+                g2d.drawString(String.valueOf(score.numGood), 220, 660);
+                g2d.setColor(Util.colorBad);
+                g2d.drawString(String.valueOf(score.numBad), 280, 660);
+                g2d.setColor(Util.colorMiss);
+                g2d.drawString(String.valueOf(score.numMiss), 340, 660);
+                g2d.setColor(new Color(255, 255, 255));
+                g2d.drawString(String.format("%.2f", score.accuracy()), 400, 660);
+            } else {
+                g2d.drawString("No score set", 30, 660);
+            }
+
+
             int secondsRounded = (int) Math.floor(previewSong.getSecondsLength());
             int minutes = secondsRounded / 60;
             int secondsMod = secondsRounded % 60;
@@ -211,6 +231,15 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
                 engine.endMap();
                 render = null;
                 currentMenu = MENU_GAME_RESULTS;
+                ScoreDB.ScoreEntry oldScore = scores.scores.get(ScoreDB.getKey(engine.currentSong.metadata));
+                if(oldScore == null || engine.accuracy() > oldScore.accuracy()) {
+                    scores.scores.put(ScoreDB.getKey(engine.currentSong.metadata), new ScoreDB.ScoreEntry(engine.numPerfect, engine.numGood, engine.numBad, engine.numMiss));
+                    try {
+                        scores.saveScores(new File("scores.txt"));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         } else if (currentMenu == MENU_GAME_RESULTS) {
             drawGameResults(g);
@@ -300,6 +329,11 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
                 engine = new VSRGEngine(clickedSongSong);
                 render = new VSRGRenderer(engine);
                 currentMenu = MENU_GAME;
+            }
+        } else if(currentMenu == MENU_GAME_RESULTS) {
+            if (e.getX() > 50 && e.getX() < 550 && e.getY() > 500 && e.getY() < 550) {
+                engine = null;
+                currentMenu = MENU_SONG_SELECT;
             }
         }
     }
