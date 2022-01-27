@@ -1,3 +1,14 @@
+/*
+ * 
+ * This class is used for handling timing and scoring.
+ * It ensures that the game is not falling behind while
+ * still only checking about 60 times a second for
+ * performance reasons. It also handles key presses,
+ * and determines whether or not the player was late,
+ * on time, or early.
+ * 
+ */
+
 package io.github.dthusian.ICS3UFinal;
 
 import java.io.File;

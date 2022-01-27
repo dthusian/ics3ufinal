@@ -1,3 +1,10 @@
+/*
+ * 
+ * This class stores information about each note, which is useful
+ * when determining where a note should go and when it should be clicked.
+ * 
+ */
+
 package io.github.dthusian.ICS3UFinal;
 
 import java.util.Timer;

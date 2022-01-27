@@ -1,3 +1,11 @@
+/*
+ * 
+ * This class is used to load scores from a file and send the information
+ * to the Menu class so that it can be displayed. It is also used to
+ * store top scores into a file.
+ * 
+ */
+
 package io.github.dthusian.ICS3UFinal;
 
 import java.io.*;

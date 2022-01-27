@@ -1,3 +1,10 @@
+/*
+ * 
+ * This class handles most of the audio in the game, including the song
+ * and the sound effects (hitsounds, sounds that play when you hit a note).
+ * 
+ */
+
 package io.github.dthusian.ICS3UFinal;
 
 import javax.sound.sampled.*;

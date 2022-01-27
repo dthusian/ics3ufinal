@@ -1,3 +1,13 @@
+/*
+ * 
+ * This class is the main panel and serves as the base for the rest of the game
+ * From here, the different game states are controlled, and each game state
+ * is drawn. An instance of the VSRG engine and the VSRG renderer are stored
+ * here, and the ticking of the engine and redrawing of the renderer are also
+ * controlled by a timer here.
+ * 
+ */
+
 package io.github.dthusian.ICS3UFinal;
 
 import javax.imageio.ImageIO;

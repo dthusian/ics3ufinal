@@ -1,3 +1,11 @@
+/*
+ * 
+ * This class is used to store information about a particular song.
+ * It loads most of the information from a song folder so that it
+ * can be easily accessed by the VSRG engine.
+ * 
+ */
+
 package io.github.dthusian.ICS3UFinal;
 
 import javax.imageio.ImageIO;

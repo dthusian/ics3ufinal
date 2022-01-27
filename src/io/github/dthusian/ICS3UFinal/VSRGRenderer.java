@@ -1,3 +1,13 @@
+/*
+ * 
+ * This class is used for rendering the playfield and showing falling notes.
+ * The Y position of each note is determined by the current time relative to
+ * the note's play time, allowing notes to fall smoothly. It also updates
+ * score, accuracy, and judgement messages, which tell the player how accurate
+ * they were.
+ * 
+ */
+
 package io.github.dthusian.ICS3UFinal;
 
 import javax.sound.sampled.LineUnavailableException;

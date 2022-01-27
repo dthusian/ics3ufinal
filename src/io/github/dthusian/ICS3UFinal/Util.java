@@ -1,3 +1,9 @@
+/*
+ * 
+ * This class is used for variables and methods that are applicable globally
+ * 
+ */
+
 package io.github.dthusian.ICS3UFinal;
 
 import java.awt.*;
@@ -12,6 +18,7 @@ public class Util {
     }
 
     // lerp == Linear Interpolation (look it up)
+    // (finding point based on two existing points)
     public static double lerp(double a, double b, double v) {
         return a + (b - a) * v;
     }
