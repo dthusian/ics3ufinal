@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Scanner;
 
 public class ScoreDB {
+    // One top score entry
     public static class ScoreEntry {
         public int numPerfect;
         public int numGood;
@@ -31,6 +32,7 @@ public class ScoreDB {
     // key: beatmap id
     HashMap<String, ScoreEntry> scores;
 
+    // Load scores from a file
     public ScoreDB(File file) throws IOException {
         scores = new HashMap<>();
         if(!file.exists()) {
@@ -48,6 +50,7 @@ public class ScoreDB {
         s.close();
     }
 
+    // Save scores to a file
     public void saveScores(File file) throws IOException {
         PrintWriter writer = new PrintWriter(new FileWriter(file));
         String[] keys = scores.keySet().toArray(new String[0]);
@@ -57,6 +60,7 @@ public class ScoreDB {
         writer.close();
     }
 
+    // Find a key from the map metadata
     public static String getKey(HashMap<String, String> metadata) {
         return metadata.get("Title") + "|" + metadata.get("Artist") + "|" + metadata.get("Creator") + "|" + metadata.get("Version");
     }
