@@ -60,11 +60,16 @@ public class Song {
                     // ignore (we have no editor)
                 } else if (section.equals("Metadata")) {
                     String[] pair = line.split(":");
-                    metadata.put(pair[0], pair[1]);
+                    
+                    try {
+                    	metadata.put(pair[0], pair[1]);
+                    } catch (ArrayIndexOutOfBoundsException e) {
+                    	metadata.put(pair[0], "");
+                    }          
                 } else if (section.equals("Difficulty")) {
                     String[] pair = line.split(":");
                     if (pair[0].equals("OverallDifficulty")) {
-                        accuracy = Integer.parseInt(pair[1]);
+                        accuracy = (int) Double.parseDouble(pair[1]);
                     }
                 } else if (section.equals("Events")) {
                     String[] values = line.split(",");

@@ -145,8 +145,6 @@ public class VSRGEngine {
                 currentNote.clickState = 3;
             }
             
-            System.out.println(currentNote.endTime + " | " + masterTime + " | " + score);
-            
             // change note back to clicked
             if (currentNote.clickState != 3) {
             	currentNote.clickState = 1;
@@ -157,7 +155,7 @@ public class VSRGEngine {
     public void tick() {
         tickCount++;
         long newTime = System.currentTimeMillis() - startTime;
-        for (int i = retireNoteI + 1; i < currentSong.notes.size(); i++) {
+        for (int i = retireNoteI; i < currentSong.notes.size(); i++) {
             Note currentNote = currentSong.notes.get(i);
             if (Util.between(masterTime, currentNote.time - APPROACH_TIME, newTime)) {
                 //currentNote.posY = (int) (((time - currentNote.time) / 2) - 60);
