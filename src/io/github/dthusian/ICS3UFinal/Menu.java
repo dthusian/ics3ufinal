@@ -239,6 +239,21 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
         drawButton((Graphics2D)g, new Color(159, 64, 255), "Back", 50, 500, 500, 50, 20, myGetMousePosition());
     }
 
+    public void drawInstructions(Graphics g) {
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.setPaint(new GradientPaint(0, 0, new Color(0, 0, 99), 0, this.getHeight(), new Color(9, 0, 173)));
+        g2d.fillRect(0, 0, this.getWidth(), this.getHeight());
+        g2d.setColor(new Color(255, 255, 255));
+        g2d.setFont(new Font("sans-serif", Font.PLAIN, 20));
+        g2d.drawString("CS mania was made like a classic mania-type VSRG.", 50, 100);
+        g2d.drawString("Each lane is assigned the keys DFJK. When the notes reach the line, tap the short notes, hold on the long notes.", 50, 125);
+        g2d.drawString("Accuracy is key.", 50, 150);
+        g2d.drawString("Credits:", 50, 200);
+        g2d.drawString("Developers: Brendan Tam, Adrian Wu", 50, 225);
+        g2d.drawString("Mapping: Brendan Tam, other osu users", 50, 250);
+        drawButton(g2d, new Color(235, 102, 75), "Back", this.getWidth() - 220, 50, 200, 50, 20, myGetMousePosition());
+    }
+
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         if (currentMenu == MENU_MAIN) {
@@ -275,7 +290,9 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
         } else if (currentMenu == MENU_GAME_RESULTS) {
             drawGameResults(g);
         } else if (currentMenu == MENU_GAME_PAUSED) {
-        	drawGamePaused(g);
+            drawGamePaused(g);
+        } else if (currentMenu == MENU_CREDITS){
+            drawInstructions(g);
         } else {
             throw new RuntimeException("Invalid menu");
         }
@@ -399,6 +416,10 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
         	} else if (e.getX() > this.getWidth() / 2 - 180 && e.getX() < this.getWidth() / 2 + 180 && e.getY() > this.getHeight() / 2 + 10 && e.getY() < this.getHeight() / 2 + 80) {
         		currentMenu = MENU_SONG_SELECT;
         	}
+        } else if(currentMenu == MENU_CREDITS) {
+            if (e.getX() > this.getWidth() - 220 && e.getX() < this.getWidth() - 20 && e.getY() > 50 && e.getY() < 100) {
+                currentMenu = MENU_MAIN;
+            }
         }
     }
 
