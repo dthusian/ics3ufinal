@@ -2,15 +2,17 @@ package io.github.dthusian.ICS3UFinal;
 
 import javax.sound.sampled.*;
 import java.io.*;
-import java.nio.Buffer;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class VSRGAudio {
+    // Represents a currently running audio stream
+    // Most of the code is in loadMusic2 and this is just for defining some methods
+    // to communicate with the thread
     static class AudioStream {
         public Thread thread;
-        public AtomicInteger signal;
+        public AtomicInteger signal; // 0 = play, 1 = pause, 2 = stop
         public double length;
 
         AudioStream(Thread t, AtomicInteger i, double lengthSeconds) {
@@ -67,16 +69,20 @@ public class VSRGAudio {
         clip.start();
     }
 
-    // attempt 2
+    // this is the most ungodly function
+    // I really hate SourceDataLine
     public static AudioStream loadMusic2(String path, double startAtSeconds) throws LineUnavailableException, IOException, UnsupportedAudioFileException {
         File file = new File(path);
+        // Load audio input stream
         AudioInputStream ais = AudioSystem.getAudioInputStream(new BufferedInputStream(new FileInputStream(file)));
         AudioFormat audioFormat = ais.getFormat();
+        // Setup data line
         DataLine.Info info = new DataLine.Info(SourceDataLine.class, audioFormat);
         SourceDataLine line = (SourceDataLine) AudioSystem.getLine(info);
         line.open(audioFormat);
         line.start();
         ais.skip((int) Math.floor(audioFormat.getFrameSize() * audioFormat.getFrameRate() * startAtSeconds));
+        // Setup thread
         AtomicInteger signal = new AtomicInteger(1);
         AtomicInteger signalData = new AtomicInteger(0);
         Thread audioThread = new Thread(() -> {
@@ -84,10 +90,12 @@ public class VSRGAudio {
                 byte[] samples = new byte[4096];
                 int count = 0;
                 while (true) {
+                    // Check the signal for things to do
                     int signalToken = signal.get();
                     if (signalToken != 0) {
                         if (signalToken == 1) {
                             while (signalToken == 1) {
+                                // When paused, check every 10ms for unpause
                                 Thread.sleep(10);
                                 signalToken = signal.get();
                             }
@@ -95,6 +103,7 @@ public class VSRGAudio {
                             break;
                         }
                     }
+                    // Normal operation: read samples and write them
                     count = ais.read(samples, 0, 4096);
                     if (count == -1) break;
                     line.write(samples, 0, count);
@@ -108,14 +117,16 @@ public class VSRGAudio {
             }
         });
         audioThread.start();
+        // calculate the duration of the file
+        // 99% accurate
         long audioFileLength = file.length();
         int frameSize = audioFormat.getFrameSize();
         double frameRate = audioFormat.getFrameRate();
         double durationInSeconds = (audioFileLength / (frameSize * frameRate));
-        AudioStream as = new AudioStream(audioThread, signal, durationInSeconds);
-        return as;
+        return new AudioStream(audioThread, signal, durationInSeconds);
     }
 
+    // Overload for default starting at beginning
     public static AudioStream loadMusic2(String path) throws UnsupportedAudioFileException, LineUnavailableException, IOException {
         return loadMusic2(path, 0);
     }
