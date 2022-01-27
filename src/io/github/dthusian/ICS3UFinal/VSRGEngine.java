@@ -33,7 +33,6 @@ public class VSRGEngine {
     public int numGood = 0;
     public int numBad = 0;
     public int numMiss = 0;
-    public long score = 0;
     
     public int lastJudgement = -1; // 0 = miss, 1 = bad, 2 = good, 3 = perfect
     public long lastJudgementTime = -1;
@@ -81,17 +80,14 @@ public class VSRGEngine {
             long msError = Math.abs(masterTime - currentNote.time);
             if(msError <= Util.Timing.msPerfect) {
                 numPerfect++;
-                score += 150;
                 lastJudgement = 3;
                 lastJudgementTime = masterTime;
             } else if(msError <= Util.Timing.msGood) {
                 numGood++;
-                score += 100;
                 lastJudgement = 2;
                 lastJudgementTime = masterTime;
             } else if(msError <= Util.Timing.msBad) {
                 numBad++;
-                score += 50;
                 lastJudgement = 1;
                 lastJudgementTime = masterTime;
             } else if(msError <= Util.Timing.msMiss) {
@@ -124,17 +120,14 @@ public class VSRGEngine {
             long msError = Math.abs(masterTime - currentNote.endTime);
             if(msError <= Util.Timing.msPerfect) {
                 numPerfect++;
-                score += 150;
                 lastJudgement = 3;
                 lastJudgementTime = masterTime;
             } else if(msError <= Util.Timing.msGood) {
                 numGood++;
-                score += 100;
                 lastJudgement = 2;
                 lastJudgementTime = masterTime;
             } else if(msError <= Util.Timing.msBad) {
                 numBad++;
-                score += 50;
                 lastJudgement = 1;
                 lastJudgementTime = masterTime;
             } else if(msError <= Util.Timing.msMiss) {
@@ -200,5 +193,9 @@ public class VSRGEngine {
 
     public double accuracy() {
         return 100 * (numBad * 0.25 + numGood * 0.5 + numPerfect) / (numMiss + numBad + numGood + numPerfect);
+    }
+
+    public int score() {
+        return numPerfect * 150 + numGood * 100 + numBad * 50;
     }
 }

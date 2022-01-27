@@ -58,7 +58,7 @@ public class VSRGRenderer {
         // Score display
         g.setFont(new Font("sans-serif", Font.PLAIN, 50));
         g.setColor(new Color(255, 255, 255));
-        g.drawString(String.valueOf(eng.score), 20, 50);
+        g.drawString(String.valueOf(eng.score()), 20, 50);
         g.drawString(String.format("%.2f", eng.accuracy()), 20, 100);
 
         // Draw notes

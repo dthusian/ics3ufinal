@@ -23,6 +23,9 @@ public class ScoreDB {
         public double accuracy() {
             return 100 * (numBad * 0.25 + numGood * 0.5 + numPerfect) / (numMiss + numBad + numGood + numPerfect);
         }
+        public int score() {
+            return numPerfect * 150 + numGood * 100 + numBad * 50;
+        }
     }
 
     // key: beatmap id

@@ -1,12 +1,10 @@
 package io.github.dthusian.ICS3UFinal;
 
-import javax.imageio.ImageIO;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -45,7 +43,8 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
         new Thread(this).start();
     }
 
-    private void loadSongs() throws IOException, UnsupportedAudioFileException, LineUnavailableException {
+    // Load all songs into song select variables
+    private void loadSongs() throws IOException {
         String songsFolderPath = "src/io/github/dthusian/ICS3UFinal/songs";
         File songsFolder = new File(songsFolderPath);
         if (!songsFolder.exists()) {
@@ -77,6 +76,8 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
         scores = new ScoreDB(new File("scores.txt"));
     }
 
+    // Draws a button
+    // Mouse position used to determine whether to highlight the button
     private boolean drawButton(Graphics2D g, Color col, String text, int baseX, int baseY, int width, int height, int slant, Point mousePos) {
         g.setFont(new Font("sans-serif", Font.PLAIN, 20));
         boolean hoveredOver = false;
@@ -102,6 +103,7 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
         return hoveredOver;
     }
 
+    // Draws the main menu
     public void drawMainMenu(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
         g2d.setPaint(new GradientPaint(0, 0, new Color(0, 0, 99), 0, this.getHeight(), new Color(9, 0, 173)));
@@ -115,8 +117,10 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
         g2d.drawString("CS Mania", 50, 400);
     }
 
+    // Draws song select
     public void drawSongSelect(Graphics g) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
         Graphics2D g2d = (Graphics2D) g;
+        // Draw background if available
         if(lastHoveredSong == -1) {
             g2d.setPaint(new GradientPaint(0, 0, new Color(0, 0, 99), 0, this.getHeight(), new Color(9, 0, 173)));
             g2d.fillRect(0, 0, this.getWidth(), this.getHeight());
@@ -129,6 +133,7 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
             loadSongs();
         }
 
+        // Draw all the buttons
         Point p = myGetMousePosition();
         int scroll = -scrollOffset;
         int hoveredSong = -1;
@@ -139,6 +144,8 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
             }
             scroll += 100;
         }
+
+        // Draw the stats window
         g2d.setColor(new Color(0, 0, 0, 170));
         g2d.fillRect(20, 500, getWidth() - 40, getHeight() - 520);
         if (hoveredSong != -1) {
@@ -155,24 +162,25 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
             g2d.drawString("Title: " + metadata.get("Title"), 30, 540);
             g2d.drawString("Artist: " + metadata.get("Artist"), 30, 560);
             g2d.drawString("Mapper: " + metadata.get("Creator"), 30, 580);
-            g2d.drawString("OD: " + hoveredSongSong.accuracy, 30, 600);
-            g2d.drawString("Notes: " + hoveredSongSong.notes.size(), 30, 620);
+            g2d.drawString("Notes: " + hoveredSongSong.notes.size(), 30, 600);
 
+            // Draw the score entry
             ScoreDB.ScoreEntry score = scores.scores.get(ScoreDB.getKey(metadata));
             if(score != null) {
-                g2d.drawString("Top Score:", 30, 660);
+                g2d.drawString("Top Score:", 30, 640);
                 g2d.setColor(Util.colorPerfect);
-                g2d.drawString(String.valueOf(score.numPerfect), 160, 660);
+                g2d.drawString(String.valueOf(score.numPerfect), 160, 640);
                 g2d.setColor(Util.colorGood);
-                g2d.drawString(String.valueOf(score.numGood), 220, 660);
+                g2d.drawString(String.valueOf(score.numGood), 220, 640);
                 g2d.setColor(Util.colorBad);
-                g2d.drawString(String.valueOf(score.numBad), 280, 660);
+                g2d.drawString(String.valueOf(score.numBad), 280, 640);
                 g2d.setColor(Util.colorMiss);
-                g2d.drawString(String.valueOf(score.numMiss), 340, 660);
+                g2d.drawString(String.valueOf(score.numMiss), 340, 640);
                 g2d.setColor(new Color(255, 255, 255));
-                g2d.drawString(String.format("%.2f", score.accuracy()), 400, 660);
+                g2d.drawString(String.format("%.2f", score.accuracy()), 400, 640);
+                g2d.drawString(String.valueOf(score.score()), 480, 640);
             } else {
-                g2d.drawString("No score set", 30, 660);
+                g2d.drawString("No score set", 30, 640);
             }
 
 
