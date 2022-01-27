@@ -264,6 +264,7 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
         g.drawString(String.format("Miss: %d", engine.numMiss), 50, 340);
         g.setColor(new Color(255, 255, 255));
         g.drawString(String.format("Accuracy: %.2f", engine.accuracy()), 50, 420);
+        g.drawString(String.format("Score: %d", engine.score()), 50, 500);
         drawButton((Graphics2D)g, new Color(235, 102, 75), "Back", 50, this.getHeight() - 100, 200, 50, 20, myGetMousePosition());
     }
 
