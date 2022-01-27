@@ -39,6 +39,9 @@ public class VSRGEngine {
     public int lastJudgement = -1; // 0 = miss, 1 = bad, 2 = good, 3 = perfect
     public long lastJudgementTime = -1;
 
+    // Hitsounds
+    public String hitsound;
+
 	public VSRGEngine(Song song) throws RuntimeException {
         currentSong = song;
         endTime = 0;
@@ -56,6 +59,19 @@ public class VSRGEngine {
                 song.audio.resume();
             }
         }, GRACE_TIME);
+        try {
+            hitsound = VSRGAudio.loadSfx("src/io/github/dthusian/ICS3UFinal/hitsounds/normal-hitnormal.wav");
+        } catch (LineUnavailableException | UnsupportedAudioFileException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            try {
+                hitsound = VSRGAudio.loadSfx("hitsounds/normal-hitnormal.wav");
+            } catch (LineUnavailableException | UnsupportedAudioFileException ex) {
+                ex.printStackTrace();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
     }
 
 	public void keyPress(int lane) {
@@ -208,10 +224,6 @@ public class VSRGEngine {
 
     // plays a hitsound
     public void playHitsound() {
-    	try {
-			VSRGAudio.playSfx(VSRGAudio.loadSfx("src/io/github/dthusian/ICS3UFinal/hitsounds/normal-hitnormal.wav"));
-		} catch (RuntimeException | LineUnavailableException | UnsupportedAudioFileException | IOException e) {
-			e.printStackTrace();
-		}
+        VSRGAudio.playSfx(hitsound);
     }
 }
