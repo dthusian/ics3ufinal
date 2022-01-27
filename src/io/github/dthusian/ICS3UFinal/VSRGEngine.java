@@ -137,7 +137,6 @@ public class VSRGEngine {
                 numMiss++;
                 lastJudgement = 0;
                 lastJudgementTime = masterTime;
-                System.out.println("MISS");
             } else if(masterTime < currentNote.endTime) {
                 // too early :bruh:
             	numMiss++;

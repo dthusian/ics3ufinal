@@ -1,13 +1,16 @@
 package io.github.dthusian.ICS3UFinal;
 
+import javax.imageio.ImageIO;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
@@ -32,6 +35,9 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
     // Game vars
     VSRGEngine engine = null;
     VSRGRenderer render = null;
+    
+    // main menu background
+    BufferedImage mainMenuBg;
 
     public Menu(JFrame frame) {
         super();
@@ -42,6 +48,14 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
         addKeyListener(this);
         addMouseWheelListener(this);
         frame.addWindowListener(this);
+        
+        File bgFile = new File("src/io/github/dthusian/ICS3UFinal/mainmenubg.png");
+        try {
+			mainMenuBg = ImageIO.read(bgFile);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+        
         new Thread(this).start();
     }
 
@@ -109,15 +123,20 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
     // Draws the main menu
     public void drawMainMenu(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
-        g2d.setPaint(new GradientPaint(0, 0, new Color(0, 0, 99), 0, this.getHeight(), new Color(9, 0, 173)));
-        g2d.fillRect(0, 0, this.getWidth(), this.getHeight());
+        
+        g2d.drawImage(mainMenuBg, 0, 0, this.getWidth(), this.getHeight(), this);
+        
+        g2d.setColor(new Color(0, 0, 0, 50));
+        g2d.fillRect(0, 0, this.getWidth(), 100);
+        g2d.fillRect(0, this.getHeight() - 100, this.getWidth(), 100);
+        
         Point p = myGetMousePosition();
-        drawButton(g2d, new Color(75, 136, 235), "Play", 50, 50, 200, 50, 20, p);
-        drawButton(g2d, new Color(235, 102, 75), "Credits", 50, 150, 200, 50, 20, p);
-        drawButton(g2d, new Color(136, 235, 75), "Quit", 50, 250, 200, 50, 20, p);
+        drawButton(g2d, new Color(235, 102, 75), "Play", this.getWidth() / 2 - 100, this.getHeight() / 2 - 75, 200, 50, 30, p);
+        drawButton(g2d, new Color(235, 102, 75), "Credits", this.getWidth() / 2 - 100, this.getHeight() / 2, 200, 50, 30, p);
+        drawButton(g2d, new Color(235, 102, 75), "Quit", this.getWidth() / 2 - 100, this.getHeight() / 2 + 75, 200, 50, 30, p);
         g2d.setColor(new Color(240, 240, 240));
-        g2d.setFont(new Font("sans-serif", Font.PLAIN, 50));
-        g2d.drawString("CS Mania", 50, 400);
+        g2d.setFont(new Font("sans-serif", Font.BOLD, 100));
+        g2d.drawString("CS Mania", this.getWidth() / 2 - 225, this.getHeight() / 2 - 150);
     }
     
     // Draws song select
@@ -125,8 +144,7 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
         Graphics2D g2d = (Graphics2D) g;
         // Draw background if available
         if(lastHoveredSong == -1) {
-            g2d.setPaint(new GradientPaint(0, 0, new Color(0, 0, 99), 0, this.getHeight(), new Color(9, 0, 173)));
-            g2d.fillRect(0, 0, this.getWidth(), this.getHeight());
+        	g2d.drawImage(mainMenuBg, 0, 0, this.getWidth(), this.getHeight(), this);
         } else {
             g2d.drawImage(songs.get(lastHoveredSong).background, 0, 0, getWidth(), getHeight(), this);
         }
@@ -142,7 +160,7 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
         int hoveredSong = -1;
         for (int i = 0; i < songs.size(); i++) {
             HashMap<String, String> metadata = songs.get(i).metadata;
-            if (drawButton(g2d, new Color(159, 64, 255), metadata.get("Artist") + " - " + metadata.get("Title") + " [" + metadata.get("Version") + "] ", 50, 50 + scroll, 800, 50, 20, p)) {
+            if (drawButton(g2d, new Color(70, 70, 70), metadata.get("Artist") + " - " + metadata.get("Title") + " [" + metadata.get("Version") + "] ", 50, 50 + scroll, 800, 50, 20, p)) {
                 hoveredSong = i;
             }
             scroll += 100;
@@ -214,7 +232,7 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
     	Graphics2D g2d = (Graphics2D) g;
     	g2d.setColor(new Color(0, 0, 0));
     	g2d.fillRect(this.getWidth() / 2 - 202, this.getHeight() / 2 - 102, 404, 204);
-    	g2d.setColor(new Color(50, 50, 50));
+    	g2d.setColor(new Color(90, 90, 90));
     	g2d.fillRect(this.getWidth() / 2 - 200, this.getHeight() / 2 - 100, 400, 200);
     	
     	drawButton(g2d, new Color(70, 70, 70), "Resume", this.getWidth() / 2 - 180, this.getHeight() / 2 - 80, 360, 70, 20, myGetMousePosition());
@@ -237,13 +255,16 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
         g.drawString(String.format("Miss: %d", engine.numMiss), 50, 340);
         g.setColor(new Color(255, 255, 255));
         g.drawString(String.format("Accuracy: %.2f", engine.accuracy()), 50, 420);
-        drawButton((Graphics2D)g, new Color(159, 64, 255), "Back", 50, 500, 500, 50, 20, myGetMousePosition());
+        drawButton((Graphics2D)g, new Color(235, 102, 75), "Back", 50, this.getHeight() - 100, 500, 50, 20, myGetMousePosition());
     }
 
     public void drawInstructions(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
-        g2d.setPaint(new GradientPaint(0, 0, new Color(0, 0, 99), 0, this.getHeight(), new Color(9, 0, 173)));
+        g2d.setColor(new Color(70, 70, 70));
         g2d.fillRect(0, 0, this.getWidth(), this.getHeight());
+        
+        g2d.drawImage(mainMenuBg, 0, 0, this.getWidth(), this.getHeight(), this);
+        
         g2d.setColor(new Color(255, 255, 255));
         g2d.setFont(new Font("sans-serif", Font.PLAIN, 20));
         g2d.drawString("CS mania was made like a classic mania-type VSRG.", 50, 100);
@@ -369,11 +390,11 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
     @Override
     public void mousePressed(MouseEvent e) {
         if (currentMenu == MENU_MAIN) {
-            if (e.getX() > 50 && e.getX() < 250 && e.getY() > 50 && e.getY() < 100) {
+            if (e.getX() > this.getWidth() / 2 - 100 && e.getX() < this.getWidth() / 2 + 100 && e.getY() > this.getHeight() / 2 - 75 && e.getY() < this.getHeight() / 2 - 25) {
                 currentMenu = MENU_SONG_SELECT;
-            } else if (e.getX() > 50 && e.getX() < 250 && e.getY() > 150 && e.getY() < 200) {
+            } else if (e.getX() > this.getWidth() / 2 - 100 && e.getX() < this.getWidth() / 2 + 100 && e.getY() > this.getHeight() / 2 && e.getY() < this.getHeight() / 2 + 50) {
                 currentMenu = MENU_CREDITS;
-            } else if (e.getX() > 50 && e.getX() < 250 && e.getY() > 250 && e.getY() < 300) {
+            } else if (e.getX() > this.getWidth() / 2 - 100 && e.getX() < this.getWidth() / 2 + 100 && e.getY() > this.getHeight() / 2 + 75 && e.getY() < this.getHeight() / 2 + 125) {
                 close();
             }
         } else if (currentMenu == MENU_SONG_SELECT) {
@@ -404,7 +425,7 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
             }
         } else if(currentMenu == MENU_GAME_RESULTS) {
             // Back button
-            if (e.getX() > 50 && e.getX() < 550 && e.getY() > 500 && e.getY() < 550) {
+            if (e.getX() > 50 && e.getX() < 550 && e.getY() > this.getHeight() - 100 && e.getY() < this.getHeight() - 50) {
                 engine = null;
                 currentMenu = MENU_SONG_SELECT;
             }
