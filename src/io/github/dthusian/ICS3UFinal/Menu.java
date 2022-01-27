@@ -33,7 +33,7 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
     VSRGEngine engine = null;
     VSRGRenderer render = null;
 
-    public Menu() {
+    public Menu(JFrame frame) {
         super();
         setPreferredSize(new Dimension(1280, 720));
         setBackground(new Color(0, 0, 0));
@@ -41,6 +41,7 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
         addMouseListener(this);
         addKeyListener(this);
         addMouseWheelListener(this);
+        frame.addWindowListener(this);
         new Thread(this).start();
     }
 
@@ -470,7 +471,7 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
 
     @Override
     public void windowClosing(WindowEvent e) {
-
+        System.exit(0);
     }
 
     @Override
