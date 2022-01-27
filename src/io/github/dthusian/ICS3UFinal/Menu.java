@@ -153,7 +153,7 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
         if (hoveredSong != -1) {
             // Play the song on hover
             Song hoveredSongSong = songs.get(hoveredSong);
-            if (lastHoveredSong == -1 || !Objects.equals(songs.get(lastHoveredSong).metadata.get("BeatmapSetID"), hoveredSongSong.metadata.get("BeatmapSetID"))) {
+            if (lastHoveredSong == -1 || previewSong == null || !Objects.equals(songs.get(lastHoveredSong).metadata.get("BeatmapSetID"), hoveredSongSong.metadata.get("BeatmapSetID"))) {
                 if (previewSong != null) {
                     previewSong.stop();
                 }
