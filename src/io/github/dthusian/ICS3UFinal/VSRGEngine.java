@@ -49,6 +49,8 @@ public class VSRGEngine {
     
     public int lastJudgement = -1; // 0 = miss, 1 = bad, 2 = good, 3 = perfect
     public long lastJudgementTime = -1;
+    
+    public Timer t = null;
 
 	public VSRGEngine(Song song) throws RuntimeException {
         currentSong = song;
@@ -60,7 +62,7 @@ public class VSRGEngine {
         }
         startTime = System.currentTimeMillis() + GRACE_TIME;
         masterTime = -GRACE_TIME;
-        Timer t = new Timer();
+        t = new Timer();
         t.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -111,6 +113,8 @@ public class VSRGEngine {
             } else {
                 currentNote.clickState = 1;
             }
+            
+            break;
         }
     }
 

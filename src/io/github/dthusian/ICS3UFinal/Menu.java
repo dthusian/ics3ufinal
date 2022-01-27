@@ -24,6 +24,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class Menu extends JPanel implements MouseListener, KeyListener, Runnable, MouseWheelListener, WindowListener {
     public static final int MENU_MAIN = 0;
@@ -92,6 +94,10 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
         if (listFiles == null) {
             throw new RuntimeException("Songs folder not present");
         }
+        
+        // keeps track of each individual difficulty (since one folder can have multiple difficulties/maps)
+        int totalMaps = 0;
+        
         for (int i = 0; i < listFiles.length; i++) {
             // get each song inside songs folder
             File[] innerFiles = listFiles[i].listFiles();
@@ -100,13 +106,14 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
                 if (innerFiles[j].getName().substring(Math.max(innerFiles[j].getName().length() - 4, 0)).equals(".osu")) {
                     foundOsuFile = true;
                     songs.add(new Song(innerFiles[j].getAbsolutePath()));
+                    totalMaps++;
                 }
             }
             if (!foundOsuFile) {
                 throw new FileNotFoundException("no .osu file");
             }
         }
-        maxScroll = listFiles.length * 100 - 100;
+        maxScroll = totalMaps * 100 - 100;
         scores = new ScoreDB(new File("scores.txt"));
     }
 
@@ -401,6 +408,7 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
             	render.frozen = true;
             	engine.currentSong.audio.stop();
             	engine.currentSong.audio = null;
+            	engine.t.cancel();
             	try {
 					engine.currentSong.audio = VSRGAudio.loadMusic2(engine.currentSong.audioPath, engine.masterTime / 1000.0);
 				} catch (LineUnavailableException | IOException | UnsupportedAudioFileException e1) {
@@ -413,7 +421,17 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
 	        	currentMenu = MENU_GAME;
 	        	render.frozen = false;
 	        	engine.startTime = engine.startTime + (System.currentTimeMillis() - (engine.masterTime + engine.startTime));
-	        	engine.currentSong.audio.resume();
+	        	Timer newTimer = new Timer();
+	        	if (engine.masterTime < 0) {
+	        		newTimer.schedule(new TimerTask() {
+			            @Override
+			            public void run() {
+			                engine.currentSong.audio.resume();
+			            }
+			        }, Math.abs(engine.masterTime));
+	        	} else {
+	        		engine.currentSong.audio.resume();
+	        	}
 	        }
         }
     }
@@ -474,8 +492,10 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
                 } catch (UnsupportedAudioFileException | LineUnavailableException | IOException ex) {
                     ex.printStackTrace();
                 }
-                previewSong.stop();
-                previewSong = null;
+                if (previewSong != null) {
+                	previewSong.stop();
+                    previewSong = null;
+                } 
                 engine = new VSRGEngine(clickedSongSong);
                 render = new VSRGRenderer(engine);
                 currentMenu = MENU_GAME;
@@ -491,7 +511,17 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
         		currentMenu = MENU_GAME;
 	        	render.frozen = false;
 	        	engine.startTime = engine.startTime + (System.currentTimeMillis() - (engine.masterTime + engine.startTime));
-	        	engine.currentSong.audio.resume();
+	        	Timer newTimer = new Timer();
+	        	if (engine.masterTime < 0) {
+	        		newTimer.schedule(new TimerTask() {
+			            @Override
+			            public void run() {
+			                engine.currentSong.audio.resume();
+			            }
+			        }, Math.abs(engine.masterTime));
+	        	} else {
+	        		engine.currentSong.audio.resume();
+	        	}
         	} else if (e.getX() > this.getWidth() / 2 - 180 && e.getX() < this.getWidth() / 2 + 180 && e.getY() > this.getHeight() / 2 + 10 && e.getY() < this.getHeight() / 2 + 80) {
         		currentMenu = MENU_SONG_SELECT;
         	}
