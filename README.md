@@ -7,8 +7,13 @@ We implemented a mania-style VSRG.
 
 Simply build the source under `src/`.
 There are no dependencies to manage.
-Copy the `songs` directory to the same working directory
-as the jar file.
+Copy `songs/`, `hitsounds/`, and `mainmenubg.png` to the same
+working directory as the jar file.
+
+## Run Instructions
+
+If you have a `dist/` folder, simply enter that folder
+and run `CSMania.jar`.
 
 ## Known Bugs
 - Slight audio overlap in song select
