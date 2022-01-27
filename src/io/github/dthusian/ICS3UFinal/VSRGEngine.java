@@ -1,6 +1,11 @@
 package io.github.dthusian.ICS3UFinal;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
+
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 
 public class VSRGEngine {
     // Time to get ready
@@ -37,7 +42,22 @@ public class VSRGEngine {
     public int lastJudgement = -1; // 0 = miss, 1 = bad, 2 = good, 3 = perfect
     public long lastJudgementTime = -1;
 
-    public VSRGEngine(Song song) throws RuntimeException {
+	public VSRGEngine(Song song) throws RuntimeException, LineUnavailableException, UnsupportedAudioFileException, IOException {
+        String hitsoundsFolderPath = "src/io/github/dthusian/ICS3UFinal/hitsounds";
+        File hitsoundsFolder = new File(hitsoundsFolderPath);
+        System.out.println("hdi");
+        if (!hitsoundsFolder.exists()) {
+            hitsoundsFolderPath = "hitsounds/";
+            hitsoundsFolder = new File(hitsoundsFolderPath);
+            if (!hitsoundsFolder.exists()) {
+                throw new Error("Could not find songs folder");
+            }
+        }
+        File[] hitsounds = hitsoundsFolder.listFiles();
+        for (int i = 0; i < hitsounds.length; i++) {
+        	System.out.println(hitsounds[i].getName());
+        }
+    	
         currentSong = song;
         endTime = 0;
         for (int i = 0; i < song.notes.size(); i++) {
@@ -63,7 +83,7 @@ public class VSRGEngine {
         }, 250, 250);
     }
 
-    public void keyPress(int lane) {
+	public void keyPress(int lane) {
         for(int i = retireNoteI; i < dispatchNoteI + 1; i++) {
             Note currentNote = currentSong.notes.get(i);
             // ignore pressed notes
@@ -79,14 +99,17 @@ public class VSRGEngine {
             // note is eligible for click
             long msError = Math.abs(masterTime - currentNote.time);
             if(msError <= Util.Timing.msPerfect) {
+            	this.playHitsound();
                 numPerfect++;
                 lastJudgement = 3;
                 lastJudgementTime = masterTime;
             } else if(msError <= Util.Timing.msGood) {
+            	this.playHitsound();
                 numGood++;
                 lastJudgement = 2;
                 lastJudgementTime = masterTime;
             } else if(msError <= Util.Timing.msBad) {
+            	this.playHitsound();
                 numBad++;
                 lastJudgement = 1;
                 lastJudgementTime = masterTime;
@@ -119,14 +142,17 @@ public class VSRGEngine {
             // note release is relevant
             long msError = Math.abs(masterTime - currentNote.endTime);
             if(msError <= Util.Timing.msPerfect) {
+            	this.playHitsound();
                 numPerfect++;
                 lastJudgement = 3;
                 lastJudgementTime = masterTime;
             } else if(msError <= Util.Timing.msGood) {
+            	this.playHitsound();
                 numGood++;
                 lastJudgement = 2;
                 lastJudgementTime = masterTime;
             } else if(msError <= Util.Timing.msBad) {
+            	this.playHitsound();
                 numBad++;
                 lastJudgement = 1;
                 lastJudgementTime = masterTime;
@@ -201,5 +227,13 @@ public class VSRGEngine {
 
     public int score() {
         return numPerfect * 150 + numGood * 100 + numBad * 50;
+    }
+    
+    public void playHitsound() {
+    	try {
+			VSRGAudio.playSfx(VSRGAudio.loadSfx("src/io/github/dthusian/ICS3UFinal/hitsounds/normal-hitnormal.wav"));
+		} catch (RuntimeException | LineUnavailableException | UnsupportedAudioFileException | IOException e) {
+			e.printStackTrace();
+		}
     }
 }

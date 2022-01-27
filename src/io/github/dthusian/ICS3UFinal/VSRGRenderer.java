@@ -1,8 +1,12 @@
 package io.github.dthusian.ICS3UFinal;
 
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.font.FontRenderContext;
+import java.io.File;
+import java.io.IOException;
 
 public class VSRGRenderer {
     final Color[] laneColors = new Color[]{
