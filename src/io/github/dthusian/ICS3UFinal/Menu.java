@@ -18,6 +18,7 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
     public static final int MENU_GAME = 2;
     public static final int MENU_CREDITS = 3;
     public static final int MENU_GAME_RESULTS = 4;
+    public static final int MENU_GAME_PAUSED = 5;
     public int currentMenu = 0;
 
     // Song select vars
@@ -117,7 +118,7 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
         g2d.setFont(new Font("sans-serif", Font.PLAIN, 50));
         g2d.drawString("CS Mania", 50, 400);
     }
-
+    
     // Draws song select
     public void drawSongSelect(Graphics g) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
         Graphics2D g2d = (Graphics2D) g;
@@ -202,6 +203,19 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
         render.draw(this, g);
         engine.tick();
     }
+    
+    // Pause
+    public void drawGamePaused(Graphics g) {
+    	render.draw(this, g);
+    	
+    	Graphics2D g2d = (Graphics2D) g;
+    	g2d.setColor(new Color(0, 0, 0));
+    	g2d.fillRect(this.getWidth() / 2 - 202, this.getHeight() / 2 - 102, 404, 204);
+    	g2d.setColor(new Color(50, 50, 50));
+    	g2d.fillRect(this.getWidth() / 2 - 200, this.getHeight() / 2 - 100, 400, 200);
+    	
+    	drawButton(g2d, new Color(70, 70, 70), "Resume", this.getWidth() / 2 - 180, this.getHeight() / 2 - 80, 360, 60, 20, myGetMousePosition());
+    }
 
     // Draw a game result window
     public void drawGameResults(Graphics g) {
@@ -257,6 +271,8 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
             }
         } else if (currentMenu == MENU_GAME_RESULTS) {
             drawGameResults(g);
+        } else if (currentMenu == MENU_GAME_PAUSED) {
+        	drawGamePaused(g);
         } else {
             throw new RuntimeException("Invalid menu");
         }
@@ -285,8 +301,27 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
                 render.keyPress(2);
             } else if (e.getKeyChar() == 'k') {
                 render.keyPress(3);
+            } else if (e.getKeyCode() == 27) {
+            	currentMenu = MENU_GAME_PAUSED;
+            	render.frozen = true;
+            	engine.currentSong.audio.stop();
+            	engine.currentSong.audio = null;
+            	try {
+					engine.currentSong.audio = VSRGAudio.loadMusic2(engine.currentSong.audioPath, engine.masterTime / 1000.0);
+					System.out.println("epic");
+				} catch (LineUnavailableException | IOException | UnsupportedAudioFileException e1) {
+					System.out.println("unepic");
+				}
             }
             repaint();
+        } else if (currentMenu == MENU_GAME_PAUSED) {
+        	if (e.getKeyCode() == 27) {
+	        	currentMenu = MENU_GAME;
+	        	render.frozen = false;
+	        	engine.startTime = engine.startTime + (System.currentTimeMillis() - (engine.masterTime + engine.startTime));
+	        	engine.currentSong.audio.resume();
+	        	System.out.println("Audio Started");
+	        }
         }
     }
 
