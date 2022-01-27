@@ -211,6 +211,23 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
                 g2d.setColor(new Color(255, 255, 255));
                 g2d.drawString(String.format("%.2f", score.accuracy()), 400, this.getHeight() - 30);
                 g2d.drawString(String.valueOf(score.score()), 480, this.getHeight() - 30);
+                if (score.accuracy() >= 90) {
+                    g.setColor(Util.colorPerfect);
+                    g.drawString("A", 560, this.getHeight() - 30);
+                } else if (score.accuracy() >= 80) {
+                    g.setColor(Util.colorGood);
+                    g.drawString("B", 560, this.getHeight() - 30);
+                } else if (score.accuracy() >= 70) {
+                    g.setColor(Util.colorGood);
+                    g.drawString("C", 560, this.getHeight() - 30);
+                } else if (score.accuracy() >= 60) {
+                    g.setColor(Util.colorBad);
+                    g.drawString("D", 560, this.getHeight() - 30);
+                } else {
+                    g.setColor(Util.colorBad);
+                    g.drawString("F", 560, this.getHeight() - 30);
+                }
+                g2d.setColor(new Color(255, 255, 255));
             } else {
                 g2d.drawString("No score set", 30, this.getHeight() - 30);
             }
