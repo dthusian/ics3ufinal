@@ -214,7 +214,8 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
     	g2d.setColor(new Color(50, 50, 50));
     	g2d.fillRect(this.getWidth() / 2 - 200, this.getHeight() / 2 - 100, 400, 200);
     	
-    	drawButton(g2d, new Color(70, 70, 70), "Resume", this.getWidth() / 2 - 180, this.getHeight() / 2 - 80, 360, 60, 20, myGetMousePosition());
+    	drawButton(g2d, new Color(70, 70, 70), "Resume", this.getWidth() / 2 - 180, this.getHeight() / 2 - 80, 360, 70, 20, myGetMousePosition());
+    	drawButton(g2d, new Color(70, 70, 70), "Quit", this.getWidth() / 2 - 180, this.getHeight() / 2 + 10, 360, 70, 20, myGetMousePosition());
     }
 
     // Draw a game result window
@@ -320,7 +321,6 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
 	        	render.frozen = false;
 	        	engine.startTime = engine.startTime + (System.currentTimeMillis() - (engine.masterTime + engine.startTime));
 	        	engine.currentSong.audio.resume();
-	        	System.out.println("Audio Started");
 	        }
         }
     }
@@ -383,6 +383,15 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
                 engine = null;
                 currentMenu = MENU_SONG_SELECT;
             }
+        } else if (currentMenu == MENU_GAME_PAUSED) {
+        	if (e.getX() > this.getWidth() / 2 - 180 && e.getX() < this.getWidth() / 2 + 180 && e.getY() > this.getHeight() / 2 - 80 && e.getY() < this.getHeight() / 2 - 10) {
+        		currentMenu = MENU_GAME;
+	        	render.frozen = false;
+	        	engine.startTime = engine.startTime + (System.currentTimeMillis() - (engine.masterTime + engine.startTime));
+	        	engine.currentSong.audio.resume();
+        	} else if (e.getX() > this.getWidth() / 2 - 180 && e.getX() < this.getWidth() / 2 + 180 && e.getY() > this.getHeight() / 2 + 10 && e.getY() < this.getHeight() / 2 + 80) {
+        		currentMenu = MENU_SONG_SELECT;
+        	}
         }
     }
 
