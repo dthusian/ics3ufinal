@@ -350,9 +350,8 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
             	engine.currentSong.audio = null;
             	try {
 					engine.currentSong.audio = VSRGAudio.loadMusic2(engine.currentSong.audioPath, engine.masterTime / 1000.0);
-					System.out.println("epic");
 				} catch (LineUnavailableException | IOException | UnsupportedAudioFileException e1) {
-					System.out.println("unepic");
+					e1.printStackTrace();
 				}
             }
             repaint();
