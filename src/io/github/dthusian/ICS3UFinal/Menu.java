@@ -18,7 +18,7 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
     public static final int MENU_GAME = 2;
     public static final int MENU_CREDITS = 3;
     public static final int MENU_GAME_RESULTS = 4;
-    int currentMenu = 0;
+    public int currentMenu = 0;
 
     // Song select vars
     ArrayList<Song> songs = new ArrayList<>();
@@ -81,6 +81,7 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
     private boolean drawButton(Graphics2D g, Color col, String text, int baseX, int baseY, int width, int height, int slant, Point mousePos) {
         g.setFont(new Font("sans-serif", Font.PLAIN, 20));
         boolean hoveredOver = false;
+        // highlight gradient if hovered over
         if (mousePos.x > baseX && mousePos.x < baseX + width && mousePos.y > baseY && mousePos.y < baseY + height) {
             hoveredOver = true;
             g.setPaint(new GradientPaint(0, baseY, col, 0, baseY + height, Util.colLerp(col, new Color(255, 255, 255), 0.7)));
@@ -149,6 +150,7 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
         g2d.setColor(new Color(0, 0, 0, 170));
         g2d.fillRect(20, 500, getWidth() - 40, getHeight() - 520);
         if (hoveredSong != -1) {
+            // Play the song on hover
             Song hoveredSongSong = songs.get(hoveredSong);
             if (lastHoveredSong == -1 || !Objects.equals(songs.get(lastHoveredSong).metadata.get("BeatmapSetID"), hoveredSongSong.metadata.get("BeatmapSetID"))) {
                 if (previewSong != null) {
@@ -157,6 +159,7 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
                 previewSong = VSRGAudio.loadMusic2(hoveredSongSong.audioPath, hoveredSongSong.previewTimeMs / 1000.0);
                 previewSong.resume();
             }
+            // Basic data about map
             HashMap<String, String> metadata = hoveredSongSong.metadata;
             g2d.setColor(new Color(255, 255, 255));
             g2d.drawString("Title: " + metadata.get("Title"), 30, 540);
@@ -182,8 +185,7 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
             } else {
                 g2d.drawString("No score set", 30, 640);
             }
-
-
+            // Draw the length
             int secondsRounded = (int) Math.floor(previewSong.getSecondsLength());
             int minutes = secondsRounded / 60;
             int secondsMod = secondsRounded % 60;
@@ -201,6 +203,7 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
         engine.tick();
     }
 
+    // Draw a game result window
     public void drawGameResults(Graphics g) {
         g.drawImage(engine.currentSong.background, 0, 0, getWidth(), getHeight(), this);
         g.setColor(new Color(0, 0, 0, 170));
@@ -235,11 +238,14 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
             } catch (IOException | UnsupportedAudioFileException | LineUnavailableException e) {
                 e.printStackTrace();
             }
+            // Handle when the map is done
+            // There isn't any mouse/keypress associated with this event
             if (engine.isMapFinished()) {
                 engine.endMap();
                 render = null;
                 currentMenu = MENU_GAME_RESULTS;
                 ScoreDB.ScoreEntry oldScore = scores.scores.get(ScoreDB.getKey(engine.currentSong.metadata));
+                // Only save higher scores
                 if(oldScore == null || engine.accuracy() > oldScore.accuracy()) {
                     scores.scores.put(ScoreDB.getKey(engine.currentSong.metadata), new ScoreDB.ScoreEntry(engine.numPerfect, engine.numGood, engine.numBad, engine.numMiss));
                     try {
@@ -256,10 +262,7 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
         }
     }
 
-    public int getCurrentMenu() {
-        return currentMenu;
-    }
-
+    // Convenience method to get mouse position
     private Point myGetMousePosition() {
         Point p = MouseInfo.getPointerInfo().getLocation();
         SwingUtilities.convertPointFromScreen(p, this);
@@ -325,6 +328,7 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
                     clickedSong = i;
                 }
             }
+            // When song clicked, enter song
             if (clickedSong != -1) {
                 Song clickedSongSong = songs.get(clickedSong);
                 try {
@@ -339,6 +343,7 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
                 currentMenu = MENU_GAME;
             }
         } else if(currentMenu == MENU_GAME_RESULTS) {
+            // Back button
             if (e.getX() > 50 && e.getX() < 550 && e.getY() > 500 && e.getY() < 550) {
                 engine = null;
                 currentMenu = MENU_SONG_SELECT;

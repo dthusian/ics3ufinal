@@ -30,13 +30,17 @@ public class Song {
         notes = new ArrayList<>();
         Scanner fileReader = new Scanner(new FileReader(path));
         String signature = fileReader.nextLine();
-        if (!signature.equals("osu file format v14")) {
+        /*
+        * This big method is for parsing osu!mania maps
+        * Why? so that it's easy to import existing maps into this game
+        * and so that we don't have to spend all our time mapping
+        * */
+        if (!signature.equals("osu file format v14") && !signature.equals("osu file format v13")) {
             throw new RuntimeException("Invalid file");
         }
         String section = "";
         while (fileReader.hasNext()) {
             String line = fileReader.nextLine().trim();
-
             if (line.equals("") || line.startsWith("//")) {
                 // do nothing
             } else if (line.charAt(0) == '[') {
@@ -49,7 +53,8 @@ public class Song {
                             throw new RuntimeException("Invalid file");
                         }
                     } else if (pair[0].equals("AudioFilename")) {
-                        Path path2 = Path.of(path).getParent().resolve(pair[1]);
+                        int index = pair[1].lastIndexOf(".");
+                        Path path2 = Path.of(path).getParent().resolve(pair[1].substring(0, index) + ".wav");
                         audioPath = String.valueOf(path2);
                     } else if (pair[0].equals("AudioLeadIn")) {
                         audioLeadInMs = Integer.parseInt(pair[1]);
@@ -102,13 +107,9 @@ public class Song {
         }
     }
 
+    // Load the audio
+    // Not done in constructor for perf reasons
     public void loadAudio() throws UnsupportedAudioFileException, LineUnavailableException, IOException {
         audio = VSRGAudio.loadMusic2(audioPath);
     }
-
-    public void dimBg(float factor, float offset) {
-        RescaleOp rescaleOp = new RescaleOp(factor, offset, null);
-        rescaleOp.filter(this.background, this.background);
-    }
-
 }
