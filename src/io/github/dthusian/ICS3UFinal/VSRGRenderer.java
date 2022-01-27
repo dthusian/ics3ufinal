@@ -13,6 +13,9 @@ public class VSRGRenderer {
     };
     VSRGEngine eng;
     boolean[] keysPressed;
+    
+    public boolean frozen = false;
+    public long lastTime;
 
     public VSRGRenderer(VSRGEngine eng) {
         this.eng = eng;
@@ -60,7 +63,13 @@ public class VSRGRenderer {
         g.drawString(String.format("%.2f", eng.accuracy()), 20, 100);
 
         // Draw notes
-        long time = System.currentTimeMillis() - eng.startTime;
+        long time;
+        if (frozen) {
+        	time = lastTime;
+        } else {
+        	time = System.currentTimeMillis() - eng.startTime;
+        }
+        
         for (int i = eng.retireNoteI; i <= eng.dispatchNoteI; i++) {
             Note currentNote = eng.currentSong.notes.get(i);
             final int NOTE_THICKNESS = 30;
@@ -100,5 +109,7 @@ public class VSRGRenderer {
             g2d.setColor(judgementCol);
             g2d.drawString(judgementStr, (int) (panel.getWidth() / 2 - g2d.getFont().getStringBounds(judgementStr, g2d.getFontRenderContext()).getWidth() / 2), panel.getHeight() - 120);
         }
+        
+        lastTime = time;
     }
 }

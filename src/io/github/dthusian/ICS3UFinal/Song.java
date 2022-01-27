@@ -34,6 +34,7 @@ public class Song {
         * This big method is for parsing osu!mania maps
         * Why? so that it's easy to import existing maps into this game
         * and so that we don't have to spend all our time mapping
+        * and because we do not have a working editor
         * */
         if (!signature.equals("osu file format v14") && !signature.equals("osu file format v13")) {
             throw new RuntimeException("Invalid file");
