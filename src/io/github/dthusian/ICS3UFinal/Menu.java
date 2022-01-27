@@ -193,6 +193,8 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
             g2d.drawString("Length: " + minutes + ":" + String.format("%02d", secondsMod), 30, 520);
             lastHoveredSong = hoveredSong;
         }
+        
+        drawButton(g2d, new Color(235, 102, 75), "Back", this.getWidth() - 220, 50, 200, 50, 20, p);
     }
 
     public void drawGame(Graphics g) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
@@ -357,6 +359,11 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
                 close();
             }
         } else if (currentMenu == MENU_SONG_SELECT) {
+        	if (e.getX() > this.getWidth() - 220 && e.getX() < this.getWidth() - 20 && e.getY() > 50 && e.getY() < 100) {
+        		currentMenu = MENU_MAIN;
+        		return;
+        	}
+        	
             int clickedSong = -1;
             for (int i = 0; i < songs.size(); i++) {
                 if (e.getX() > 50 && e.getX() < 850 && e.getY() + scrollOffset > i * 100 + 50 && e.getY() + scrollOffset < i * 100 + 150) {
