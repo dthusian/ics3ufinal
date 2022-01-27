@@ -25,7 +25,7 @@ public class Song {
     public int audioLeadInMs = 0;
     public int previewTimeMs = 0;
 
-    public Song(String path) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
+    public Song(String path) throws IOException {
         metadata = new HashMap<>();
         notes = new ArrayList<>();
         Scanner fileReader = new Scanner(new FileReader(path));

@@ -12,6 +12,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 
 public class Menu extends JPanel implements MouseListener, KeyListener, Runnable, MouseWheelListener, WindowListener {
     public static final int MENU_MAIN = 0;
@@ -114,8 +115,12 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
 
     public void drawSongSelect(Graphics g) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
         Graphics2D g2d = (Graphics2D) g;
-        g2d.setPaint(new GradientPaint(0, 0, new Color(0, 0, 99), 0, this.getHeight(), new Color(9, 0, 173)));
-        g2d.fillRect(0, 0, this.getWidth(), this.getHeight());
+        if(lastHoveredSong == -1) {
+            g2d.setPaint(new GradientPaint(0, 0, new Color(0, 0, 99), 0, this.getHeight(), new Color(9, 0, 173)));
+            g2d.fillRect(0, 0, this.getWidth(), this.getHeight());
+        } else {
+            g2d.drawImage(songs.get(lastHoveredSong).background, 0, 0, getWidth(), getHeight(), this);
+        }
 
         // get songs folder
         if (songs.size() == 0) {
@@ -136,7 +141,7 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
         g2d.fillRect(20, 500, getWidth() - 40, getHeight() - 520);
         if (hoveredSong != -1) {
             Song hoveredSongSong = songs.get(hoveredSong);
-            if (lastHoveredSong != hoveredSong) {
+            if (lastHoveredSong == -1 || !Objects.equals(songs.get(lastHoveredSong).metadata.get("BeatmapSetID"), hoveredSongSong.metadata.get("BeatmapSetID"))) {
                 if (previewSong != null) {
                     previewSong.stop();
                 }
@@ -168,6 +173,24 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
         engine.tick();
     }
 
+    public void drawGameResults(Graphics g) {
+        g.drawImage(engine.currentSong.background, 0, 0, getWidth(), getHeight(), this);
+        g.setColor(new Color(0, 0, 0, 170));
+        g.fillRect(25, 25, getWidth() - 50, getHeight() - 50);
+        g.setFont(new Font("sans-serif", Font.PLAIN, 70));
+        g.setColor(Util.colorPerfect);
+        g.drawString(String.format("Perfect: %d", engine.numPerfect), 50, 100);
+        g.setColor(Util.colorGood);
+        g.drawString(String.format("Good: %d", engine.numGood), 50, 180);
+        g.setColor(Util.colorBad);
+        g.drawString(String.format("Bad: %d", engine.numBad), 50, 260);
+        g.setColor(Util.colorMiss);
+        g.drawString(String.format("Miss: %d", engine.numMiss), 50, 340);
+        g.setColor(new Color(255, 255, 255));
+        g.drawString(String.format("Accuracy: %.2f", engine.accuracy()), 50, 420);
+        drawButton((Graphics2D)g, new Color(159, 64, 255), "Back", 50, 500, 500, 50, 20, myGetMousePosition());
+    }
+
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         if (currentMenu == MENU_MAIN) {
@@ -184,6 +207,13 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
             } catch (IOException | UnsupportedAudioFileException | LineUnavailableException e) {
                 e.printStackTrace();
             }
+            if (engine.isMapFinished()) {
+                engine.endMap();
+                render = null;
+                currentMenu = MENU_GAME_RESULTS;
+            }
+        } else if (currentMenu == MENU_GAME_RESULTS) {
+            drawGameResults(g);
         } else {
             throw new RuntimeException("Invalid menu");
         }
@@ -310,7 +340,7 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
 
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
-        scrollOffset += -e.getWheelRotation() * 80;
+        scrollOffset += e.getWheelRotation() * 80;
         scrollOffset = Math.max(Math.min(scrollOffset, maxScroll), 0);
     }
 

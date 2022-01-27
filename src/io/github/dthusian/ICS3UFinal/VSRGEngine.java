@@ -9,11 +9,15 @@ public class VSRGEngine {
     public static final long APPROACH_TIME = 1340;
     // Time from note passing the scanline to not being rendered
     public static final long MISS_TIME = 160;
+    // Time after end of map
+    public static final long END_TIME = 3000;
 
     // System.currentTimeMillis() when map started (when masterTime = 0)
     public long startTime;
     // This is the time since last tick
     public long masterTime;
+    // This is the time of the last object
+    public long endTime;
 
     // Index of last note that was retired (went offscreen)
     public int retireNoteI = 0;
@@ -36,8 +40,10 @@ public class VSRGEngine {
 
     public VSRGEngine(Song song) throws RuntimeException {
         currentSong = song;
+        endTime = 0;
         for (int i = 0; i < song.notes.size(); i++) {
             song.notes.get(i).clickState = 0;
+            endTime = Math.max(song.notes.get(i).endTime, endTime);
         }
         startTime = System.currentTimeMillis() + GRACE_TIME;
         masterTime = -GRACE_TIME;
@@ -141,7 +147,6 @@ public class VSRGEngine {
             	numMiss++;
             	lastJudgement = 0;
             	lastJudgementTime = masterTime;
-         
                 currentNote.clickState = 3;
             }
             
@@ -158,7 +163,6 @@ public class VSRGEngine {
         for (int i = retireNoteI; i < currentSong.notes.size(); i++) {
             Note currentNote = currentSong.notes.get(i);
             if (Util.between(masterTime, currentNote.time - APPROACH_TIME, newTime)) {
-                //currentNote.posY = (int) (((time - currentNote.time) / 2) - 60);
                 dispatchNoteI = Math.max(dispatchNoteI, i);
             }
             if (Util.between(masterTime, currentNote.endTime + MISS_TIME, newTime)) {
@@ -183,5 +187,18 @@ public class VSRGEngine {
         if (lastJudgementTime < masterTime - 1500) {
         	lastJudgement = -1;
         }
+    }
+
+    public boolean isMapFinished() {
+        return masterTime >= endTime + END_TIME;
+    }
+
+    public void endMap() {
+        currentSong.audio.stop();
+        currentSong.audio = null;
+    }
+
+    public double accuracy() {
+        return 100 * (numBad * 0.25 + numGood * 0.5 + numPerfect) / (numMiss + numBad + numGood + numPerfect);
     }
 }

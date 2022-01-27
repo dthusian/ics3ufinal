@@ -21,4 +21,8 @@ public class Util {
         public static final long msGood = 50;
         public static final long msPerfect = 30;
     }
+    public static final Color colorMiss = new Color(120, 0, 0);
+    public static final Color colorBad = new Color(120, 0, 0);
+    public static final Color colorGood = new Color(30, 150, 200);
+    public static final Color colorPerfect = new Color(200, 150, 30);
 }

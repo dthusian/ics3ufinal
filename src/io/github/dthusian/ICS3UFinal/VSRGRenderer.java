@@ -56,11 +56,10 @@ public class VSRGRenderer {
         drawLane(panel, g2d, +75, 3, laneColors[3]);
 
         // Score display
-        g.setFont(new Font("sans-serif", Font.PLAIN, 52));
-        g.drawString(String.valueOf(eng.score), 20, 50);
         g.setFont(new Font("sans-serif", Font.PLAIN, 50));
         g.setColor(new Color(255, 255, 255));
         g.drawString(String.valueOf(eng.score), 20, 50);
+        g.drawString(String.format("%.2f", eng.accuracy()), 20, 100);
 
         // Draw notes
         long time = System.currentTimeMillis() - eng.startTime;
@@ -85,20 +84,21 @@ public class VSRGRenderer {
         boolean setJudgement = true;
         if (eng.lastJudgement == 0) {
             judgementStr = "Miss";
-            judgementCol = new Color(120, 0, 0);
+            judgementCol = Util.colorMiss;
         } else if (eng.lastJudgement == 1) {
             judgementStr = "Bad";
-            judgementCol = new Color(120, 0, 0);
+            judgementCol = Util.colorBad;
         } else if (eng.lastJudgement == 2) {
             judgementStr = "Good";
-            judgementCol = new Color(30, 150, 200);
+            judgementCol = Util.colorGood;
         } else if (eng.lastJudgement == 3) {
             judgementStr = "Perfect";
-            judgementCol = new Color(200, 150, 30);
+            judgementCol = Util.colorPerfect;
         } else {
             setJudgement = false;
         }
         if (setJudgement) {
+            g2d.setFont(new Font("sans-serif", Font.BOLD, 25));
             g2d.setColor(judgementCol);
             g2d.drawString(judgementStr, (int) (panel.getWidth() / 2 - g2d.getFont().getStringBounds(judgementStr, g2d.getFontRenderContext()).getWidth() / 2), panel.getHeight() - 100);
         }
