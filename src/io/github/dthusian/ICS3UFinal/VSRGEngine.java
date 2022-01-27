@@ -192,7 +192,11 @@ public class VSRGEngine {
     }
 
     public double accuracy() {
-        return 100 * (numBad * 0.25 + numGood * 0.5 + numPerfect) / (numMiss + numBad + numGood + numPerfect);
+        double acc = 100 * (numBad * 0.25 + numGood * 0.5 + numPerfect) / (numMiss + numBad + numGood + numPerfect);
+        if(Double.isNaN(acc)) {
+            return 0;
+        }
+        return acc;
     }
 
     public int score() {
