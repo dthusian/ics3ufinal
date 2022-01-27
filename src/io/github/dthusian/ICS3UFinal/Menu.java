@@ -25,7 +25,7 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
     ArrayList<Song> songs = new ArrayList<>();
     int lastHoveredSong = -1;
     VSRGAudio.AudioStream previewSong = null;
-    int scrollOffset = 0;
+    int scrollOffset = 0;					
     int maxScroll = 0;
     ScoreDB scores = null;
 
@@ -150,7 +150,7 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
 
         // Draw the stats window
         g2d.setColor(new Color(0, 0, 0, 170));
-        g2d.fillRect(20, 500, getWidth() - 40, getHeight() - 520);
+        g2d.fillRect(20, getHeight() - 155, getWidth() - 40, 140);
         if (hoveredSong != -1) {
             // Play the song on hover
             Song hoveredSongSong = songs.get(hoveredSong);
@@ -164,34 +164,34 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
             // Basic data about map
             HashMap<String, String> metadata = hoveredSongSong.metadata;
             g2d.setColor(new Color(255, 255, 255));
-            g2d.drawString("Title: " + metadata.get("Title"), 30, 540);
-            g2d.drawString("Artist: " + metadata.get("Artist"), 30, 560);
-            g2d.drawString("Mapper: " + metadata.get("Creator"), 30, 580);
-            g2d.drawString("Notes: " + hoveredSongSong.notes.size(), 30, 600);
+            g2d.drawString("Title: " + metadata.get("Title"), 30, this.getHeight() - 130);
+            g2d.drawString("Artist: " + metadata.get("Artist"), 30, this.getHeight() - 110);
+            g2d.drawString("Mapper: " + metadata.get("Creator"), 30, this.getHeight() - 90);
+            g2d.drawString("Notes: " + hoveredSongSong.notes.size(), 30, this.getHeight() - 70);
 
             // Draw the score entry
             ScoreDB.ScoreEntry score = scores.scores.get(ScoreDB.getKey(metadata));
             if(score != null) {
-                g2d.drawString("Top Score:", 30, 640);
+                g2d.drawString("Top Score:", 30, this.getHeight() - 30);
                 g2d.setColor(Util.colorPerfect);
-                g2d.drawString(String.valueOf(score.numPerfect), 160, 640);
+                g2d.drawString(String.valueOf(score.numPerfect), 160, this.getHeight() - 30);
                 g2d.setColor(Util.colorGood);
-                g2d.drawString(String.valueOf(score.numGood), 220, 640);
+                g2d.drawString(String.valueOf(score.numGood), 220, this.getHeight() - 30);
                 g2d.setColor(Util.colorBad);
-                g2d.drawString(String.valueOf(score.numBad), 280, 640);
+                g2d.drawString(String.valueOf(score.numBad), 280, this.getHeight() - 30);
                 g2d.setColor(Util.colorMiss);
-                g2d.drawString(String.valueOf(score.numMiss), 340, 640);
+                g2d.drawString(String.valueOf(score.numMiss), 340, this.getHeight() - 30);
                 g2d.setColor(new Color(255, 255, 255));
-                g2d.drawString(String.format("%.2f", score.accuracy()), 400, 640);
-                g2d.drawString(String.valueOf(score.score()), 480, 640);
+                g2d.drawString(String.format("%.2f", score.accuracy()), 400, this.getHeight() - 30);
+                g2d.drawString(String.valueOf(score.score()), 480, this.getHeight() - 30);
             } else {
-                g2d.drawString("No score set", 30, 640);
+                g2d.drawString("No score set", 30, this.getHeight() - 30);
             }
             // Draw the length
             int secondsRounded = (int) Math.floor(previewSong.getSecondsLength());
             int minutes = secondsRounded / 60;
             int secondsMod = secondsRounded % 60;
-            g2d.drawString("Length: " + minutes + ":" + String.format("%02d", secondsMod), 30, 520);
+            g2d.drawString("Length: " + minutes + ":" + String.format("%02d", secondsMod), 30, this.getHeight() - 50);
             lastHoveredSong = hoveredSong;
         }
         
