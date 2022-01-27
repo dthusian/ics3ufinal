@@ -210,8 +210,14 @@ public class VSRGEngine {
     public void playHitsound() {
     	try {
 			VSRGAudio.playSfx(VSRGAudio.loadSfx("src/io/github/dthusian/ICS3UFinal/hitsounds/normal-hitnormal.wav"));
-		} catch (RuntimeException | LineUnavailableException | UnsupportedAudioFileException | IOException e) {
+		} catch (LineUnavailableException | UnsupportedAudioFileException e) {
 			e.printStackTrace();
-		}
+		} catch (IOException e) {
+            try {
+                VSRGAudio.playSfx(VSRGAudio.loadSfx("hitsounds/normal-hitnormal.wav"));
+            } catch (LineUnavailableException | UnsupportedAudioFileException | IOException ex) {
+                ex.printStackTrace();
+            }
+        }
     }
 }
