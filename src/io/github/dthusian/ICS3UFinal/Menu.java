@@ -266,6 +266,23 @@ public class Menu extends JPanel implements MouseListener, KeyListener, Runnable
         g.drawString(String.format("Accuracy: %.2f", engine.accuracy()), 50, 420);
         g.drawString(String.format("Score: %d", engine.score()), 50, 500);
         drawButton((Graphics2D)g, new Color(235, 102, 75), "Back", 50, this.getHeight() - 100, 200, 50, 20, myGetMousePosition());
+        g.setFont(new Font("sans-serif", Font.BOLD, 200));
+        if (engine.accuracy() >= 90) {
+            g.setColor(Util.colorPerfect);
+            g.drawString("A", this.getWidth() - 200, 250);
+        } else if (engine.accuracy() >= 80) {
+            g.setColor(Util.colorGood);
+            g.drawString("B", this.getWidth() - 200, 250);
+        } else if (engine.accuracy() >= 70) {
+            g.setColor(Util.colorGood);
+            g.drawString("C", this.getWidth() - 200, 250);
+        } else if (engine.accuracy() >= 60) {
+            g.setColor(Util.colorBad);
+            g.drawString("D", this.getWidth() - 200, 250);
+        } else {
+            g.setColor(Util.colorBad);
+            g.drawString("F", this.getWidth() - 200, 250);
+        }
     }
 
     public void drawInstructions(Graphics g) {
