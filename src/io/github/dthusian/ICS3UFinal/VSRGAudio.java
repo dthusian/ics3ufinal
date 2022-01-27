@@ -4,6 +4,8 @@ import javax.sound.sampled.*;
 import java.io.*;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class VSRGAudio {
@@ -44,6 +46,7 @@ public class VSRGAudio {
 
     // internal cache of sound effects
     static HashMap<String, Clip> sfxs = new HashMap<>();
+    static Timer t = new Timer();
 
     // Class that loads a sound effect to play at a later time
     // The string returned from this should be inputted into playSfx
@@ -51,10 +54,12 @@ public class VSRGAudio {
     public static String loadSfx(String path) throws LineUnavailableException, UnsupportedAudioFileException, IOException {
         // creates a semi-unique key based on the filename
         String key = Paths.get(path).getFileName().toString();
-        // open clip and put it into cache
-        Clip clip = AudioSystem.getClip();
-        clip.open(AudioSystem.getAudioInputStream(new File(path)));
-        sfxs.put(key, clip);
+        if(sfxs.get(key) == null) {
+            // open clip and put it into cache
+            Clip clip = AudioSystem.getClip();
+            clip.open(AudioSystem.getAudioInputStream(new File(path)));
+            sfxs.put(key, clip);
+        }
         return key;
     }
 
