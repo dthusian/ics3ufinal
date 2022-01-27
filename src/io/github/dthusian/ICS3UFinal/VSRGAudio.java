@@ -3,8 +3,14 @@ package io.github.dthusian.ICS3UFinal;
 import javax.sound.sampled.*;
 import java.io.*;
 import java.nio.file.Paths;
+import java.util.ArrayDeque;
 import java.util.HashMap;
+import java.util.Queue;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class VSRGAudio {
     // Represents a currently running audio stream
@@ -42,31 +48,56 @@ public class VSRGAudio {
         }
     }
 
-    // internal cache of sound effects
-    static HashMap<String, Clip> sfxs = new HashMap<>();
-
-    // Class that loads a sound effect to play at a later time
-    // The string returned from this should be inputted into playSfx
-
-    public static String loadSfx(String path) throws LineUnavailableException, UnsupportedAudioFileException, IOException {
-        // creates a semi-unique key based on the filename
-        String key = Paths.get(path).getFileName().toString();
-        // open clip and put it into cache
-        Clip clip = AudioSystem.getClip();
-        clip.open(AudioSystem.getAudioInputStream(new File(path)));
-        sfxs.put(key, clip);
-        return key;
+    static class SoundEffect {
+        public AudioFormat format;
+        public byte[] data;
+        public SoundEffect(String path) throws UnsupportedAudioFileException, IOException {
+            AudioInputStream ais = AudioSystem.getAudioInputStream(new File(path));
+            data = ais.readAllBytes();
+            format = ais.getFormat();
+            ais.close();
+        }
     }
 
-    public static void playSfx(String key) throws RuntimeException {
-        // gets the sound effect from cache
-        Clip clip = sfxs.get(key);
-        if (clip == null) {
-            throw new RuntimeException("Clip not found");
+    static HashMap<String, SoundEffect> sfxs = new HashMap<>();
+    static Lock sfxLock = new ReentrantLock();
+    static Queue<Clip> clipQueue = new ArrayDeque<>();
+    static Thread sfxThread = new Thread(() -> {
+        while(true) {
+            sfxLock.lock();
+            Clip clip;
+            if(!clipQueue.isEmpty()) {
+                clip = clipQueue.remove();
+            } else {
+                clip = null;
+            }
+            sfxLock.unlock();
+            if(clip != null) {
+                clip.addLineListener(event -> {
+                    if(event.getType() == LineEvent.Type.STOP){
+                        event.getLine().close();
+                    }
+                });
+                clip.start();
+            }
         }
-        // set to beginning and start
-        clip.setMicrosecondPosition(0);
-        clip.start();
+    });
+
+    static {
+        sfxThread.start();
+    }
+
+    // Play a single sound effect
+    public static void playSfx(String path) throws RuntimeException, UnsupportedAudioFileException, IOException, LineUnavailableException {
+        // gets the sound effect from cache
+        if(!sfxs.containsKey(path)) {
+            sfxs.put(path, new SoundEffect(path));
+        }
+        Clip clip = AudioSystem.getClip();
+        clip.open(sfxs.get(path).format, sfxs.get(path).data, 0, sfxs.get(path).data.length);
+        sfxLock.lock();
+        clipQueue.add(clip);
+        sfxLock.unlock();
     }
 
     // this is the most ungodly function

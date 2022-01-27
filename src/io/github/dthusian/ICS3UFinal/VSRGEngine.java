@@ -209,12 +209,12 @@ public class VSRGEngine {
     // plays a hitsound
     public void playHitsound() {
     	try {
-			VSRGAudio.playSfx(VSRGAudio.loadSfx("src/io/github/dthusian/ICS3UFinal/hitsounds/normal-hitnormal.wav"));
+			VSRGAudio.playSfx("src/io/github/dthusian/ICS3UFinal/hitsounds/normal-hitnormal.wav");
 		} catch (LineUnavailableException | UnsupportedAudioFileException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
             try {
-                VSRGAudio.playSfx(VSRGAudio.loadSfx("hitsounds/normal-hitnormal.wav"));
+                VSRGAudio.playSfx("hitsounds/normal-hitnormal.wav");
             } catch (LineUnavailableException | UnsupportedAudioFileException | IOException ex) {
                 ex.printStackTrace();
             }
