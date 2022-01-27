@@ -9,12 +9,14 @@ import java.io.File;
 import java.io.IOException;
 
 public class VSRGRenderer {
+    // Colors of each lane
     final Color[] laneColors = new Color[]{
             new Color(250, 180, 240),
             new Color(120, 200, 230),
             new Color(255, 230, 130),
             new Color(160, 230, 150)
     };
+
     VSRGEngine eng;
     boolean[] keysPressed;
     
@@ -36,6 +38,8 @@ public class VSRGRenderer {
         eng.keyRelease(lane);
     }
 
+    // Draws a lane, complete with hit effects and whatnot
+    // Does not draw notes
     public void drawLane(JPanel panel, Graphics2D g, int xBase, int laneId, Color col) {
         g.setColor(new Color(150, 150, 150));
         g.drawRect(panel.getWidth() / 2 + xBase, 0, 75, panel.getHeight());

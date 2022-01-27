@@ -30,9 +30,6 @@ public class VSRGEngine {
     public int dispatchNoteI = 0;
     public Song currentSong;
 
-    // Used for FPS counter
-    public long tickCount = 0;
-
     // Score
     public int numPerfect = 0;
     public int numGood = 0;
@@ -42,24 +39,10 @@ public class VSRGEngine {
     public int lastJudgement = -1; // 0 = miss, 1 = bad, 2 = good, 3 = perfect
     public long lastJudgementTime = -1;
 
-	public VSRGEngine(Song song) throws RuntimeException, LineUnavailableException, UnsupportedAudioFileException, IOException {
-        String hitsoundsFolderPath = "src/io/github/dthusian/ICS3UFinal/hitsounds";
-        File hitsoundsFolder = new File(hitsoundsFolderPath);
-        System.out.println("hdi");
-        if (!hitsoundsFolder.exists()) {
-            hitsoundsFolderPath = "hitsounds/";
-            hitsoundsFolder = new File(hitsoundsFolderPath);
-            if (!hitsoundsFolder.exists()) {
-                throw new Error("Could not find songs folder");
-            }
-        }
-        File[] hitsounds = hitsoundsFolder.listFiles();
-        for (int i = 0; i < hitsounds.length; i++) {
-        	System.out.println(hitsounds[i].getName());
-        }
-    	
+	public VSRGEngine(Song song) throws RuntimeException {
         currentSong = song;
         endTime = 0;
+        // reset the state of all notes
         for (int i = 0; i < song.notes.size(); i++) {
             song.notes.get(i).clickState = 0;
             endTime = Math.max(song.notes.get(i).endTime, endTime);
@@ -71,16 +54,8 @@ public class VSRGEngine {
             @Override
             public void run() {
                 song.audio.resume();
-                System.out.println("Audio Started");
             }
         }, GRACE_TIME);
-        t.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                //System.out.println("TPS: " + tickCount * 4);
-                tickCount = 0;
-            }
-        }, 250, 250);
     }
 
 	public void keyPress(int lane) {
@@ -98,6 +73,7 @@ public class VSRGEngine {
             }
             // note is eligible for click
             long msError = Math.abs(masterTime - currentNote.time);
+            // figure out judgement and do the appropriate action
             if(msError <= Util.Timing.msPerfect) {
             	this.playHitsound();
                 numPerfect++;
@@ -118,6 +94,7 @@ public class VSRGEngine {
                 lastJudgement = 0;
                 lastJudgementTime = masterTime;
             }
+            // long notes go to being held
             if(currentNote.isLongNote()) {
                 currentNote.clickState = 2;
             } else {
@@ -177,7 +154,6 @@ public class VSRGEngine {
     }
 
     public void tick() {
-        tickCount++;
         long newTime = System.currentTimeMillis() - startTime;
         for (int i = retireNoteI; i < currentSong.notes.size(); i++) {
             Note currentNote = currentSong.notes.get(i);
@@ -217,6 +193,8 @@ public class VSRGEngine {
         currentSong.audio = null;
     }
 
+    // Calculates game stats based on distribution of perfect/good/bad/miss
+
     public double accuracy() {
         double acc = 100 * (numBad * 0.25 + numGood * 0.5 + numPerfect) / (numMiss + numBad + numGood + numPerfect);
         if(Double.isNaN(acc)) {
@@ -228,7 +206,8 @@ public class VSRGEngine {
     public int score() {
         return numPerfect * 150 + numGood * 100 + numBad * 50;
     }
-    
+
+    // plays a hitsound
     public void playHitsound() {
     	try {
 			VSRGAudio.playSfx(VSRGAudio.loadSfx("src/io/github/dthusian/ICS3UFinal/hitsounds/normal-hitnormal.wav"));
