@@ -17,3 +17,4 @@ and run `CSMania.jar`.
 
 ## Known Bugs
 - Slight audio overlap in song select
+- Hitsounds stop after a while (error printed in console)
